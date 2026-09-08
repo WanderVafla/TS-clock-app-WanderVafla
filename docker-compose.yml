@@ -12,4 +12,37 @@ services:
       - "8000:8000"
     stdin_open: true
     tty: true
-    command: bash
+    command: 
+
+  postgres:
+    image: postgres:18-alpine
+    container_name: ts-clock-app-postreg
+    restart: unless-stopped
+    environment:
+      POSTGRES_NAME: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      # Where we save data after `docker compose down`
+      - pgdata:/var/lib/postgresql/data
+      # File with schemas(tables, insert(base), ...)
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      # Command from postgres, check if databese is ready for take user query 
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      # each 5s
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks: 
+      - app_network
+
+volumes:
+  pgdata:
+
+networks:
+  app_network:
+    driver: bridge
+    
