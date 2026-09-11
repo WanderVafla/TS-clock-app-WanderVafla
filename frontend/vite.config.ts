@@ -7,6 +7,7 @@ import viteReact from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 const config = defineConfig({
+  server: { host: "0.0.0.0", port: 3000 },
   resolve: { tsconfigPaths: true },
   plugins: [
     devtools(),
