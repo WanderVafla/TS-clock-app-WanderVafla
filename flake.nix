@@ -16,14 +16,11 @@
           buildInputs = [
             pkgs.docker
             pkgs.docker-compose
+            pkgs.bun
           ];
 
           shellHook = ''
-            echo "Dev shell готов."
-            echo "Доступные команды:"
-            echo "  docker compose up -d        # запустить в фоне"
-            echo "  docker compose run --rm dev # зайти внутрь сразу"
-            echo "  docker compose down         # остановить"
+            docker compose up -d
           '';
         };
       });
