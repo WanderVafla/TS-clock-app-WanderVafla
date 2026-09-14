@@ -32,9 +32,6 @@ create table if not exists labels_time_entrie (
 
 -- Index --
 create index idx_time_entries_project_id on time_entries(project_id);
-create index idx_time_entries_start_time on time_entries(start_time);
-create index idx_time_entries_end_time on time_entries(end_time);
-create index idx_time_entries_label_id on labels_time_entrie(label_id);
 
 -- Predefined list --
 INSERT INTO projects (name) VALUES ('General'), ('Work');
