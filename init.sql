@@ -9,7 +9,7 @@ create table if not exists time_entries (
     start_time timestamptz not null,
     end_time timestamptz check (end_time >= start_time),
     description varchar(255),
-    project_id int,
+    project_id int not null,
     
     foreign key (project_id) references projects(id) on delete cascade
 );
