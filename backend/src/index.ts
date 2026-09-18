@@ -1,14 +1,15 @@
 import { Elysia } from "elysia";
-import { getProjects } from "./projects/project.repository"
+import { getProjects } from "./projects/project.repository";
 
-const app = new Elysia().get("/", () => "Hello Elysia")
-  .get('/projects', getProjects())
+const app = new Elysia()
+  .get("/", () => "Hello Elysia")
+  .get("/projects", async () => await getProjects())
   .listen({
     port: 8000,
-    hostname: "0.0.0.0"
-});
+    hostname: "0.0.0.0",
+  });
 
-console.log(getProjects())
+console.log(getProjects());
 console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
+  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`,
 );
