@@ -35,3 +35,16 @@ export const deleteProject = async (
 
   return query[0] ?? null;
 };
+
+export const updateProject = async (project: projectsType.UpdateProject) => {
+  const { id, ...updateProject } = project;
+
+  console.log(updateProject);
+  const query: projectsType.Project[] = await pg`
+    update ${pg(table_name)}
+    set ${pg(updateProject)}
+    where id = ${id}
+    returning *;
+  `;
+  return query;
+};
