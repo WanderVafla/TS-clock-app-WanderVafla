@@ -1,6 +1,5 @@
 import { SQL } from "bun";
-import { ProjectSchema, type Project } from "./projects.schema";
-import * as v from "valibot";
+import type * as projectsType from "./projects.schema";
 
 // TODO: create app_db_user for database. For not use alredy admin session
 const pgUser = process.env.DB_USER;
@@ -11,21 +10,24 @@ const table_name = "projects";
 
 const pg = new SQL(`postgres://${pgUser}:${pgPass}@localhost:5432/${pgName}`);
 
-export const getProjects = async (): Promise<Project[]> => {
-  const query: Project[] = await pg`select * from ${pg(table_name)};`;
+export const getProjects = async (): Promise<projectsType.Project[]> => {
+  const query: projectsType.Project[] =
+    await pg`select * from ${pg(table_name)};`;
   return query;
 };
 
-export const createProjects = async (name: string): Promise<Project> => {
-  const values: Project = v.parse(ProjectSchema, { name: name });
-
-  const query: Project[] =
-    await pg`insert into ${pg(table_name)} ${pg(values)} RETURNING *;`;
+export const createProjects = async (
+  project: projectsType.CreateProject,
+): Promise<projectsType.Project> => {
+  const query: projectsType.Project[] =
+    await pg`insert into ${pg(table_name)} ${pg(project)} RETURNING *;`;
   return query[0];
 };
 // TODO: in routing parse if null => error 404
-export const deleteProject = async (id: number): Promise<Project | null> => {
-  const query: Project[] = await pg`
+export const deleteProject = async (
+  id: number,
+): Promise<projectsType.Project | null> => {
+  const query: projectsType.Project[] = await pg`
     delete from ${pg(table_name)}
     where id = ${id}
     returning *;
