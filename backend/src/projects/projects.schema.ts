@@ -15,3 +15,4 @@ export const UpdateProjectSchema = v.object({
 
 export type Project = v.InferOutput<typeof ProjectSchema>;
 export type UpdateProject = v.InferOutput<typeof UpdateProjectSchema>;
+export type CreateProject = v.InferOutput<typeof CreateProjectSchema>;
