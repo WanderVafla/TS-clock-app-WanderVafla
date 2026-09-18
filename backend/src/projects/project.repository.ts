@@ -1,5 +1,6 @@
 import { SQL } from "bun";
-import type { Project } from "./projects.schema";
+import { ProjectSchema, type Project } from "./projects.schema";
+import * as v from "valibot";
 
 // TODO: create app_db_user for database. For not use alredy admin session
 const pgUser = process.env.DB_USER;
@@ -16,7 +17,8 @@ export const getProjects = async (): Promise<Project[]> => {
 };
 
 export const createProjects = async (name: string): Promise<Project> => {
-  const values = { name: name };
+  const values: Project = v.parse(ProjectSchema, { name: name });
+
   const query: Project[] =
     await pg`insert into ${pg(table_name)} ${pg(values)} RETURNING *;`;
   return query[0];
