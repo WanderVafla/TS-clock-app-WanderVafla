@@ -12,7 +12,7 @@ const table_name = "projects";
 const pg = new SQL(`postgres://${pgUser}:${pgPass}@localhost:5432/${pgName}`);
 
 export const getProjects = async (): Promise<Project[]> => {
-  const query: Project[] = await pg`select * from ${pg(table_name)};`.values();
+  const query: Project[] = await pg`select * from ${pg(table_name)};`;
   return query;
 };
 
