@@ -23,3 +23,13 @@ export const createProjects = async (name: string): Promise<Project> => {
     await pg`insert into ${pg(table_name)} ${pg(values)} RETURNING *;`;
   return query[0];
 };
+// TODO: in routing parse if null => error 404
+export const deleteProject = async (id: number): Promise<Project | null> => {
+  const query: Project[] = await pg`
+    delete from ${pg(table_name)}
+    where id = ${id}
+    returning *;
+  `;
+
+  return query[0] ?? null;
+};
