@@ -6,12 +6,12 @@ export const ProjectSchema = v.object({
   created_at: v.optional(v.pipe(v.string(), v.isoTimestamp())),
 });
 
-export const CreateProjectSchema = v.pick(ProjectSchema, ['name'])
+export const CreateProjectSchema = v.pick(ProjectSchema, ["name"]);
 
 export const UpdateProjectSchema = v.object({
   id: ProjectSchema.entries.id,
-  ...v.partial(v.pick(ProjectSchema, ['name'])).entries
-})
+  ...v.partial(v.pick(ProjectSchema, ["name"])).entries,
+});
 
 export type Project = v.InferOutput<typeof ProjectSchema>;
 export type UpdateProject = v.InferOutput<typeof UpdateProjectSchema>;
