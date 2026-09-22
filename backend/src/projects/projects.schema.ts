@@ -1,17 +1,27 @@
 import * as v from "valibot";
+import { idQuerySchema } from "../shere/shema";
 
-export const ProjectSchema = v.object({
-  id: v.optional(v.number()),
-  name: v.pipe(v.string()),
-  created_at: v.optional(v.pipe(v.string(), v.isoTimestamp())),
+const ProjectSchema = v.object({
+  id: idQuerySchema,
+  name: v.pipe(
+    v.string(),
+    v.trim(),
+    v.nonEmpty(),
+    v.minLength(1),
+    v.maxLength(255),
+  ),
+  created_at: v.optional(v.pipe(v.string(), v.trim(), v.isoTimestamp())),
 });
 
 export const CreateProjectSchema = v.pick(ProjectSchema, ["name"]);
 
-export const UpdateProjectSchema = v.object({
-  id: ProjectSchema.entries.id,
-  ...v.partial(v.pick(ProjectSchema, ["name"])).entries,
-});
+export const UpdateProjectSchema = v.pipe(
+  v.object({
+    id: ProjectSchema.entries.id,
+    ...v.partial(v.pick(ProjectSchema, ["name"])).entries,
+  }),
+  v.check((i) => Object.keys(i).some((k) => k !== "id"), "nothing to update: provide at least one field (name)"),
+);
 
 export type Project = v.InferOutput<typeof ProjectSchema>;
 export type UpdateProject = v.InferOutput<typeof UpdateProjectSchema>;
