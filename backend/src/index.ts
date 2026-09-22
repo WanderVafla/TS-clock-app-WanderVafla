@@ -1,15 +1,32 @@
 import { Elysia } from "elysia";
-import { getProjects } from "./projects/project.repository";
+import { NotFoundError } from "./shere/errors";
+import { projectsRoute } from "./projects/projects.route";
+import { openapi } from "@elysia/openapi";
 
 const app = new Elysia()
+  .error({
+    NotFoundError,
+  })
+  .onError(({ code, error }) => {
+    switch (code) {
+      case "INTERNAL_SERVER_ERROR":
+        return { name: code, error };
+
+      case "NotFoundError":
+        return { name: code, message: error.message };
+
+      default:
+        return { name: code, message: error };
+    }
+  })
   .get("/", () => "Hello Elysia")
-  .get("/projects", async () => await getProjects())
+  .use(openapi())
+  .use(projectsRoute)
   .listen({
     port: 8000,
     hostname: "0.0.0.0",
   });
 
-console.log(getProjects());
 console.log(
   `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`,
 );
