@@ -10,15 +10,15 @@ const app = new Elysia()
   .onError(({ code, error }) => {
     switch (code) {
       case "INTERNAL_SERVER_ERROR":
-        return { success: true, name: code, error };
+        return { success: false, name: code, error };
 
       case "NotFoundError":
-        return { success: true, name: code, message: error.message };
+        return { success: false, name: code, message: error.message };
 
       case "VALIDATION":
-        return { success: true, name: code, message: error.message };
+        return { success: false, name: code, message: error.message };
       default:
-        return { success: true, name: code, message: error };
+        return { success: false, name: code, message: error };
     }
   })
   .get("/", () => "Hello Elysia")
