@@ -1,7 +1,7 @@
 import Elysia from "elysia";
 import * as projects from "./project.repository";
 import * as projectsSchema from "./projects.schema";
-import { idQuerySchema } from "../shere/shema";
+import { idQuerySchema } from "../share/schema";
 import * as v from "valibot";
 
 export const projectsRoute = new Elysia({ prefix: "/projects" })

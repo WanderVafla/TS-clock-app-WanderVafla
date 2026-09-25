@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { idQuerySchema } from "../shere/shema";
+import { idQuerySchema } from "../share/schema";
 
 const ProjectSchema = v.object({
   id: idQuerySchema,
