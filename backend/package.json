@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "elysia": "latest",
+    "openapi": "^1.0.1",
     "valibot": "^1.5.0"
   },
   "devDependencies": {
