@@ -50,7 +50,7 @@ export const deleteProject = async (
   const query: projectsType.Project[] = await pg`
     delete from ${pg(table_name)}
     where id = ${id}
-    returning *;
+    returning id;
   `;
 
   if (query.length === 0) {
