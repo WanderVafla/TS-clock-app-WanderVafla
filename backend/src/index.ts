@@ -1,4 +1,4 @@
-import { Elysia, status } from "elysia";
+import { Elysia } from "elysia";
 import { NotFoundError } from "./share/errors";
 import { projectsRoute } from "./projects/projects.route";
 import openapi from "@elysia/openapi";
@@ -7,7 +7,7 @@ const app = new Elysia()
   .error({
     NotFoundError,
   })
-  .onError(({ code, error }) => {
+  .onError(({ code, error, status }) => {
     switch (code) {
       case "INTERNAL_SERVER_ERROR":
         return { success: false, name: code, status: status, error };
