@@ -1,13 +1,14 @@
 import { SQL } from "bun";
 import type * as projectsType from "./projects.schema";
-import * as shereErrors from "../shere/errors";
+import * as shareErrors from "../share/errors";
 
 const pgUser = process.env.APP_DB_USER;
 const pgPass = process.env.APP_DB_PASSWORD;
 const pgName = process.env.DB_NAME;
 const pgPort = process.env.DB_PORT;
 
-const table_name = "projects";
+// Table name from Database
+const table_name = "projects" as const;
 
 const pg = new SQL(
   `postgres://${pgUser}:${pgPass}@localhost:${pgPort}/${pgName}`,
@@ -25,8 +26,8 @@ export const createProjects = async (
   const query: projectsType.Project[] =
     await pg`insert into ${pg(table_name)} ${pg(project)} RETURNING *;`;
 
-  if ((Array.isArray(query) && query.length === 0) || !query) {
-    throw new shereErrors.NotFoundError();
+  if (query.length === 0) {
+    throw new shareErrors.NotFoundError();
   }
 
   return query[0];
@@ -52,8 +53,8 @@ export const deleteProject = async (
     returning *;
   `;
 
-  if ((Array.isArray(query) && query.length === 0) || !query) {
-    throw new shereErrors.NotFoundError();
+  if (query.length === 0) {
+    throw new shareErrors.NotFoundError();
   }
 
   return query[0];
@@ -71,8 +72,8 @@ export const updateProject = async (
       returning *;
     `;
 
-  if ((Array.isArray(query) && query.length === 0) || !query) {
-    throw new shereErrors.NotFoundError();
+  if (query.length === 0) {
+    throw new shareErrors.NotFoundError();
   }
 
   return query[0];
