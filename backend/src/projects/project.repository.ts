@@ -2,7 +2,6 @@ import { SQL } from "bun";
 import type * as projectsType from "./projects.schema";
 import * as shereErrors from "../shere/errors";
 
-// TODO: create app_db_user for database. For not use alredy admin session
 const pgUser = process.env.APP_DB_USER;
 const pgPass = process.env.APP_DB_PASSWORD;
 const pgName = process.env.DB_NAME;
@@ -27,10 +26,8 @@ export const createProjects = async (
     await pg`insert into ${pg(table_name)} ${pg(project)} RETURNING *;`;
 
   if ((Array.isArray(query) && query.length === 0) || !query) {
-    throw new shereErrors.NotFoundError("NotFoundError: Form is not correct");
+    throw new shereErrors.NotFoundError();
   }
-
-  console.log(query[0]);
 
   return query[0];
 };
@@ -56,7 +53,7 @@ export const deleteProject = async (
   `;
 
   if ((Array.isArray(query) && query.length === 0) || !query) {
-    throw new shereErrors.NotFoundError("NotFoundError: Not found item");
+    throw new shereErrors.NotFoundError();
   }
 
   return query[0];
@@ -67,7 +64,7 @@ export const updateProject = async (
 ): Promise<projectsType.UpdateProject> => {
   const { id, ...updateProject } = project;
 
-  const query: projectsType.UpdateProject = await pg`
+  const query: projectsType.UpdateProject[] = await pg`
       update ${pg(table_name)}
       set ${pg(updateProject)}
       where id = ${id}
@@ -75,9 +72,8 @@ export const updateProject = async (
     `;
 
   if ((Array.isArray(query) && query.length === 0) || !query) {
-    // TODO: set constsnt for error;
-    throw new shereErrors.NotFoundError("NotFoundError: Not found item");
+    throw new shereErrors.NotFoundError();
   }
 
-  return query;
+  return query[0];
 };
