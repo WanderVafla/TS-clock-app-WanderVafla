@@ -5,9 +5,11 @@ services:
     container_name: ts-clock-app-postreg
     restart: unless-stopped
     environment:
-      POSTGRES_NAME: ${DB_NAME}
+      POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+      APP_DB_USER: ${APP_DB_USER}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD}
     ports:
       - "${DB_PORT}:5432"
     volumes:
@@ -15,6 +17,7 @@ services:
       - pgdata:/var/lib/postgresql
       # File with schemas(tables, insert(base), ...)
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./init_db.sh:/docker-entrypoint-initdb.d/init_db.sh:ro
     healthcheck:
       # Command from postgres, check if databese is ready for take user query 
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]

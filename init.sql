@@ -9,8 +9,8 @@ create table if not exists time_entries (
     start_time timestamptz not null,
     end_time timestamptz check (end_time >= start_time),
     description varchar(255),
-    project_id int,
-    
+    project_id int not null,
+
     foreign key (project_id) references projects(id) on delete cascade
 );
 
@@ -23,7 +23,7 @@ create table if not exists labels (
 create table if not exists labels_time_entrie (
     time_entry_id int not null,
     label_id int not null,
-    
+
     foreign key (label_id) references labels(id) on delete cascade,
     foreign key (time_entry_id) references time_entries(id) on delete cascade,
 
