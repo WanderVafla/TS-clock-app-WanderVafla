@@ -2,6 +2,7 @@ import { Elysia } from "elysia";
 import { NotFoundError } from "./share/errors";
 import { projectsRoute } from "./projects/projects.route";
 import openapi from "@elysia/openapi";
+import { labelsRoute } from "./labels/labels.route";
 
 const app = new Elysia()
   .error({
@@ -35,6 +36,7 @@ const app = new Elysia()
   .use(openapi())
   .get("/", () => "Hello Elysia")
   .use(projectsRoute)
+  .use(labelsRoute)
   .listen({
     port: 8000,
     hostname: "0.0.0.0",
