@@ -1,7 +1,7 @@
-import { Elysia } from "elysia";
-import { NotFoundError } from "./shere/errors";
+import { Elysia, status } from "elysia";
+import { NotFoundError } from "./share/errors";
 import { projectsRoute } from "./projects/projects.route";
-import { openapi } from "@elysia/openapi";
+import openapi from "@elysia/openapi";
 
 const app = new Elysia()
   .error({

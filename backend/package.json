@@ -6,6 +6,7 @@
     "dev": "bun --watch --env-file=../.env run src/index.ts"
   },
   "dependencies": {
+    "@elysia/openapi": "^1.4.16",
     "elysia": "latest",
     "openapi": "^1.0.1",
     "valibot": "^1.5.0"
