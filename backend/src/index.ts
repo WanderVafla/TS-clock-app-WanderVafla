@@ -10,15 +10,26 @@ const app = new Elysia()
   .onError(({ code, error }) => {
     switch (code) {
       case "INTERNAL_SERVER_ERROR":
-        return { success: false, name: code, error };
+        return { success: false, name: code, status: status, error };
 
       case "NotFoundError":
-        return { success: false, name: code, message: error.message };
+        return {
+          success: false,
+          name: code,
+          status: error.status,
+          message: error.message,
+        };
 
       case "VALIDATION":
-        return { success: false, name: code, message: error.message };
+        return {
+          success: false,
+          name: code,
+          status: 400,
+          message: error.customError,
+        };
+
       default:
-        return { success: false, name: code, message: error };
+        return { success: false, name: code, status: status, message: error };
     }
   })
   .use(openapi())
