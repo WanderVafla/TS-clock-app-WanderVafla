@@ -21,8 +21,8 @@ const app = new Elysia()
         return { success: false, name: code, message: error };
     }
   })
-  .get("/", () => "Hello Elysia")
   .use(openapi())
+  .get("/", () => "Hello Elysia")
   .use(projectsRoute)
   .listen({
     port: 8000,
