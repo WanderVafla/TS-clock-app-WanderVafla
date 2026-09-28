@@ -3,6 +3,7 @@ import { idQuerySchema } from "../share/schema";
 import * as v from "valibot";
 import { LabelSchema, type UpdateLabel, UpdateLabelSchema } from "./labels.schema";
 import { createLabel, deleteLabel, getLabels, updateLabel } from "./labels.repository";
+import { DescriptionDocs } from "../share/constants";
 
 export const labelsRoute = new Elysia({ prefix: "/labels" })
 	.get("", async () => await getLabels())
@@ -22,11 +23,7 @@ export const labelsRoute = new Elysia({ prefix: "/labels" })
 		},
 		{
 			query: v.object({ id: idQuerySchema }),
-			detail: {
-				summary: "Delete a label",
-				description:
-					"Deletes a label by id. Only its associations in labels_time_entrie are removed (ON DELETE CASCADE, see init.sql); linked time entries are preserved.",
-			},
+			detail: DescriptionDocs.detailLabelDelete
 		},
 	)
 	.patch(

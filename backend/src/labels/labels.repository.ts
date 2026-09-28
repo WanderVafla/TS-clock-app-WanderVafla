@@ -1,17 +1,9 @@
-import { SQL } from "bun";
 import type { Label, UpdateLabel } from "./labels.schema";
-import { NotFoundError } from "../share/errors";
+import { InternalError, NotFoundError } from "../share/errors";
+import { DatabaseTableNames, pg } from "../share/constants";
 
-const pgUser = process.env.APP_DB_USER;
-const pgPass = process.env.APP_DB_PASSWORD;
-const pgName = process.env.DB_NAME;
-const pgPort = process.env.DB_PORT;
-
-const table_name = "labels" as const;
-
-const pg = new SQL(
-  `postgres://${pgUser}:${pgPass}@localhost:${pgPort}/${pgName}`,
-);
+/*  Table name from Database */
+const table_name = DatabaseTableNames.labels;
 
 export const getLabels = async (): Promise<Label[]> => {
   const query: Label[] = await pg`select * from ${pg(table_name)};`;
@@ -23,7 +15,7 @@ export const createLabel = async (label: Omit<Label, "id">): Promise<Label> => {
     await pg`insert into ${pg(table_name)} ${pg(label)} RETURNING *;`;
 
   if (query.length === 0) {
-    throw new NotFoundError();
+    throw new InternalError();
   }
 
   return query[0];
@@ -39,11 +31,11 @@ export const createLabel = async (label: Omit<Label, "id">): Promise<Label> => {
  *
  * @throws NotFoundError (404) when no label with the given id exists.
  */
-export const deleteLabel = async (id: number): Promise<Label> => {
+export const deleteLabel = async (id: number): Promise<{ id: number }> => {
   const query: Label[] = await pg`
     delete from ${pg(table_name)}
     where id = ${id}
-    returning *;
+    returning id;
   `;
 
   if (query.length === 0) {
