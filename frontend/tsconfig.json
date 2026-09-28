@@ -1,5 +1,6 @@
 {
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules", "dist"],
   "compilerOptions": {
     "target": "ES2022",
     "jsx": "react-jsx",
@@ -17,7 +18,11 @@
     "verbatimModuleSyntax": true,
     "noEmit": true,
 
+    /* Import json directly into code */
+    "resolveJsonModule": true,
+    
     /* Linting */
+    "isolatedModules": true,
     "skipLibCheck": true,
     "strict": true,
     "noUnusedLocals": true,
