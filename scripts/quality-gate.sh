@@ -13,8 +13,10 @@ echo "## tsc (frontend)"
 "$ROOT/frontend/node_modules/.bin/tsc" --noEmit -p "$ROOT/frontend"
 echo "frontend tsc: OK"
 
-echo "## dead code in worktree diff"
-if git -C "$ROOT" diff HEAD -- backend frontend | grep -nE 'console\.(log|warn|debug)|TODO|FIXME'; then
+echo "## dead code in added lines of worktree diff"
+# Only '+' lines: removed lines ('-') must not fail the gate,
+# otherwise cleaning up a console.log/TODO would block the commit.
+if git -C "$ROOT" diff HEAD -- backend frontend | grep '^+' | grep -v '^+++' | grep -nE 'console\.(log|warn|debug)|TODO|FIXME'; then
   echo "dead code check: FAILED (see matches above)"
   exit 1
 fi
