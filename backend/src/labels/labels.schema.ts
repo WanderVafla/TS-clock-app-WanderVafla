@@ -1,11 +1,11 @@
 import * as v from "valibot";
-import { idBodySchema } from "../share/schema";
+import { idQuerySchema } from "../share/schema";
 import { NamesLength, ValidationError } from "../share/constants";
 
 const FieldColumnNames = ["name"] as const
 
 export const LabelSchema = v.object({
-  id: idBodySchema,
+  id: idQuerySchema,
   name: v.pipe(
     v.string(),
     v.trim(),

@@ -12,9 +12,3 @@ export const idQuerySchema = v.pipe(
   v.integer(ValidationError.NumberMustBeInteger(fieldColumn)),
   v.minValue(1, ValidationError.NumberMustBePositive(fieldColumn)),
 );
-
-export const idBodySchema = v.pipe(
-  v.number(ValidationError.NumberMustBeNumber(fieldColumn)),
-  v.integer(ValidationError.NumberMustBeInteger(fieldColumn)),
-  v.minValue(1, ValidationError.NumberMustBePositive(fieldColumn)),
-);
