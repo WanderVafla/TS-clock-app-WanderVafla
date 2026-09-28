@@ -3,6 +3,7 @@ import * as projects from "./project.repository";
 import * as projectsSchema from "./projects.schema";
 import { idQuerySchema } from "../share/schema";
 import * as v from "valibot";
+import { DescriptionDocs } from "../share/constants";
 
 export const projectsRoute = new Elysia({ prefix: "/projects" })
   .get("", async () => await projects.getProjects())
@@ -22,11 +23,7 @@ export const projectsRoute = new Elysia({ prefix: "/projects" })
     },
     {
       query: v.object({ id: idQuerySchema }),
-      detail: {
-        summary: "Delete a project",
-        description:
-          "Deletes a project by id. CASCADE: all time entries linked via time_entries.project_id (ON DELETE CASCADE, see init.sql) are deleted together with the project.",
-      },
+      detail: DescriptionDocs.detailProjectDelete,
     },
   )
   .patch(

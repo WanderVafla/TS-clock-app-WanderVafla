@@ -1,18 +1,9 @@
-import { SQL } from "bun";
 import type * as projectsType from "./projects.schema";
 import * as shareErrors from "../share/errors";
+import { DatabaseTableNames, pg } from "../share/constants";
 
-const pgUser = process.env.APP_DB_USER;
-const pgPass = process.env.APP_DB_PASSWORD;
-const pgName = process.env.DB_NAME;
-const pgPort = process.env.DB_PORT;
-
-// Table name from Database
-const table_name = "projects" as const;
-
-const pg = new SQL(
-  `postgres://${pgUser}:${pgPass}@localhost:${pgPort}/${pgName}`,
-);
+/* Table name from Database */
+const table_name = DatabaseTableNames.project;
 
 export const getProjects = async (): Promise<projectsType.Project[]> => {
   const query: projectsType.Project[] =
@@ -27,7 +18,7 @@ export const createProjects = async (
     await pg`insert into ${pg(table_name)} ${pg(project)} RETURNING *;`;
 
   if (query.length === 0) {
-    throw new shareErrors.NotFoundError();
+    throw new shareErrors.InternalError();
   }
 
   return query[0];
