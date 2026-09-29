@@ -4,3 +4,11 @@ export class NotFoundError extends Error {
     super(message)
   }
 }
+
+export class InternalError extends Error {
+  status = 500
+  constructor(message = "Action not completed") {
+    super(message)
+  }
+}
+
