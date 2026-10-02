@@ -4,13 +4,19 @@ import * as projectsSchema from "./projects.schema";
 import { idQuerySchema } from "../share/schema";
 import * as v from "valibot";
 import { DescriptionDocs } from "../share/constants";
+import { respondSuccess } from "../share/response";
 
 export const projectsRoute = new Elysia({ prefix: "/projects" })
-  .get("", async () => await projects.getProjects())
+  .get("", async ({ set }) => {
+    const data = await projects.getProjects();
+    return respondSuccess(data, set.status);
+  })
   .post(
     "",
-    async ({ body }) => {
-      return await projects.createProjects(body);
+    async ({ body, set }) => {
+      const data = await projects.createProjects(body);
+      set.status = 201;
+      return respondSuccess(data, set.status);
     },
     {
       body: projectsSchema.CreateProjectSchema,
@@ -18,8 +24,10 @@ export const projectsRoute = new Elysia({ prefix: "/projects" })
   )
   .delete(
     "",
-    async ({ query: { id } }) => {
-      return await projects.deleteProject(id);
+    async ({ query: { id }, set }) => {
+      const data = await projects.deleteProject(id);
+      set.status = 200;
+      return respondSuccess(data, set.status);
     },
     {
       query: v.object({ id: idQuerySchema }),
@@ -28,11 +36,10 @@ export const projectsRoute = new Elysia({ prefix: "/projects" })
   )
   .patch(
     "",
-    async ({ body }) => {
-      const updateProject: projectsSchema.UpdateProject =
-        await projects.updateProject(body);
+    async ({ body, set }) => {
+      const data = await projects.updateProject(body);
 
-      return updateProject;
+      return respondSuccess(data, set.status);
     },
     {
       body: projectsSchema.UpdateProjectSchema,

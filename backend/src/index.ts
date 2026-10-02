@@ -4,53 +4,42 @@ import { projectsRoute } from "./projects/projects.route";
 import openapi from "@elysia/openapi";
 import { labelsRoute } from "./labels/labels.route";
 import { SQL } from "bun";
+import { respondError } from "./share/response";
 
 const app = new Elysia()
   .error({
     NotFoundError,
     InternalError,
   })
-  .onError(({ code, error, status }) => {
+  .onError(({ code, error, set }) => {
     if (error instanceof SQL.PostgresError) {
       console.error({ code: error.code, detail: error.detail });
-      return {
-        success: false,
-        name: "ServerError",
-        status: 500,
-        message: "Server Error",
-      };
+      return respondError("ServerError", 500, "Server Error");
     }
 
     switch (code) {
       case "INTERNAL_SERVER_ERROR":
-        return { success: false, name: code, status: status, error };
+        return respondError(
+          code,
+          set.status,
+          error instanceof Error ? error.message : String(error),
+        );
 
       case "NotFoundError":
-        return {
-          success: false,
-          name: code,
-          status: error.status,
-          message: error.message,
-        };
+        return respondError(code, error.status, error.message);
 
       case "VALIDATION":
-        return {
-          success: false,
-          name: code,
-          status: 400,
-          message: error.customError,
-        };
+        return respondError(code, set.status, String(error.customError));
 
       case "InternalError":
-        return {
-          success: false,
-          name: code,
-          status: error.status,
-          message: error.message,
-        };
+        return respondError(code, error.status, error.message);
 
       default:
-        return { success: false, name: code, status: status, message: error };
+        return respondError(
+          String(code),
+          set.status,
+          error instanceof Error ? error.message : String(error),
+        );
     }
   })
   .use(openapi())
