@@ -1,6 +1,11 @@
 import * as v from "valibot";
-import { idQuerySchema } from "../share/schema";
+import { idQuerySchema, stringSchema } from "../share/schema";
 import { ValidationError } from "../share/constants";
+
+type TimeRange = {
+  start_time?: string | null;
+  end_time?: string | null;
+};
 
 const FieldColumnNames = ["description"] as const;
 const UpdateDataColumns = [
@@ -9,11 +14,16 @@ const UpdateDataColumns = [
   "start_time",
 ] as const;
 
+const isEndNotBeforeStart = ({ start_time, end_time }: TimeRange) =>
+  start_time == null ||
+  end_time == null ||
+  new Date(end_time) >= new Date(start_time);
+
 const EntiersBase = v.object({
   id: idQuerySchema,
   start_time: v.pipe(v.string(), v.isoTimestamp()),
   end_time: v.nullish(v.pipe(v.string(), v.isoTimestamp())),
-  description: v.nullish(v.pipe(v.string(), v.trim(), v.maxLength(255))),
+  description: v.nullish(v.pipe(stringSchema)),
   project_id: idQuerySchema,
 });
 
@@ -47,6 +57,14 @@ export const UpdateEntiersSchema = v.pipe(
   v.check(
     (i) => Object.keys(i).some((k) => k !== "id"),
     ValidationError.NothingToUpdate(FieldColumnNames),
+  ),
+  v.forward(
+    v.partialCheck(
+      [["start_time"], ["end_time"]],
+      isEndNotBeforeStart,
+      ValidationError.ValueIsLessThatValue("start_time", "end_time", "less"),
+    ),
+    ["end_time"],
   ),
 );
 
