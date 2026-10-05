@@ -13,6 +13,11 @@ const app = new Elysia()
   })
   .onError(({ code, error, set }) => {
     if (error instanceof SQL.PostgresError) {
+      if (error.errno === "23503") {
+        set.status = 404;
+        return respondError("NotFoundError", set.status, "Not found item");
+      }
+
       console.error({ code: error.code, detail: error.detail });
       return respondError("ServerError", 500, "Server Error");
     }

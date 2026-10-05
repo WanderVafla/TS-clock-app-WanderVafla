@@ -35,10 +35,18 @@ export const ValidationError = {
   NumberMustBePositive: (field: string) =>
     `${field} must be a positive integer (>= 1)`,
   NumberMustBeInteger: (field: string) => `${field} must be an integer`,
+  NumberTooLarge: (field: string, max: number) =>
+    `${field} must be at most ${max}`,
   // if number is like string
   NumberMustBeNumber: (field: string) => `${field} must be a number`,
   ValueMustBeStringToFirst: (field: string) =>
     `${field} must be a string at first`,
+  ValueIsLessThatValue: (
+    firstValue: string,
+    secondValue: string,
+    comparison: "less" | "more",
+  ) => `${firstValue} is ${comparison} that ${secondValue}`,
+  NulByteError: "Name must not contain NUL character",
 } as const;
 
 /*
