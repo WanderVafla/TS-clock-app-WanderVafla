@@ -5,6 +5,7 @@ import openapi from "@elysia/openapi";
 import { labelsRoute } from "./labels/labels.route";
 import { SQL } from "bun";
 import { respondError } from "./share/response";
+import { entiersRoute } from "./entries/entries.route";
 
 const app = new Elysia()
   .error({
@@ -51,6 +52,7 @@ const app = new Elysia()
   .get("/", () => "Hello Elysia")
   .use(projectsRoute)
   .use(labelsRoute)
+  .use(entiersRoute)
   .listen({
     port: 8000,
     hostname: "0.0.0.0",
