@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { idQuerySchema } from "../share/schema";
+import { idQuerySchema, stringSchema } from "../share/schema";
 import { NamesLength, ValidationError } from "../share/constants";
 
 const FieldColumnNames = ["name"] as const
@@ -7,11 +7,9 @@ const FieldColumnNames = ["name"] as const
 const ProjectSchema = v.object({
   id: idQuerySchema,
   name: v.pipe(
-    v.string(),
-    v.trim(),
+    stringSchema,
     v.nonEmpty(),
     v.minLength(NamesLength.min),
-    v.maxLength(NamesLength.max),
   ),
   created_at: v.optional(v.pipe(v.string(), v.trim(), v.isoTimestamp())),
 });
