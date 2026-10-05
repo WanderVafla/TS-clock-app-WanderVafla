@@ -26,16 +26,18 @@ export const getEntiers = async (params?: {
   return query;
 };
 
-const startEntier = async (project_id: number): Promise<Entiers> => {
+const startEntier = async (entier: CreateEntiers): Promise<Entiers> => {
   const query: Entiers[] =
-    await pg`insert into ${pg(table_name)} ${pg({ project_id: project_id })} RETURNING *;`;
+    await pg`insert into ${pg(table_name)} ${pg(entier)} RETURNING *;`;
   return query[0];
 };
 
-const finishEntier = async (id: number): Promise<Entiers> => {
-  const currentDate = { end_time: new Date() };
+const finishEntier = async (
+  id: number,
+  description?: string,
+): Promise<Entiers> => {
   const query: Entiers[] =
-    await pg`update ${pg(table_name)} set ${pg(currentDate, "end_time")} where id = ${id} RETURNING *;`;
+    await pg`update ${pg(table_name)} set end_time = now() ${description !== undefined ? pg(description) : pg``} where id = ${id} RETURNING *;`;
   return query[0];
 };
 
@@ -43,7 +45,7 @@ export const createEntier = async (entier: CreateEntiers): Promise<Entiers> => {
   const ProjectEntiers = await getEntiers({ project_id: entier.project_id });
 
   if (ProjectEntiers.length === 0) {
-    return await startEntier(entier.project_id);
+    return await startEntier(entier);
   }
 
   if (ProjectEntiers.length > 0) {
@@ -51,7 +53,7 @@ export const createEntier = async (entier: CreateEntiers): Promise<Entiers> => {
     console.log(lastEntier);
     return !lastEntier.end_time
       ? await finishEntier(lastEntier.id)
-      : await startEntier(entier.project_id);
+      : await startEntier(entier);
   }
 
   return ProjectEntiers[-1];
