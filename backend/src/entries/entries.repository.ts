@@ -1,4 +1,4 @@
-import { InternalError, NotFoundError } from "../share/errors";
+import { NotFoundError } from "../share/errors";
 import { DatabaseTableNames, pg } from "../share/constants";
 import type {
   CreateEntiers,
@@ -125,7 +125,7 @@ export const createEntryLabel = async (
       on conflict (label_id, time_entry_id) do nothing returning *;`;
 
   if (query.length === 0) {
-    throw new InternalError();
+    throw new NotFoundError();
   }
 
   return query[0];
