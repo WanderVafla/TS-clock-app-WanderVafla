@@ -14,10 +14,10 @@ const link_table_name = DatabaseTableNames.entries_labels;
 export const getEntiers = async (params?: {
   id?: number;
   project_id?: number;
-}): Promise<Entiers[]> => {
+}): Promise<Entiers[] | []> => {
   const { id, project_id } = params || {};
 
-  const query: Entiers[] = await pg`select * from ${pg(table_name)}
+  const query: Entiers[] | [] = await pg`select * from ${pg(table_name)}
         where true
           ${id !== undefined ? pg`and id = ${id}` : pg``}
           ${project_id !== undefined ? pg`and project_id = ${project_id}` : pg``}
