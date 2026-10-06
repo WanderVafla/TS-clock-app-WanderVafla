@@ -1,7 +1,6 @@
 import { Elysia } from "elysia";
 import { InternalError, NotFoundError } from "./share/errors";
 import { projectsRoute } from "./projects/projects.route";
-import openapi from "@elysia/openapi";
 import { labelsRoute } from "./labels/labels.route";
 import { SQL } from "bun";
 import { respondError } from "./share/response";
@@ -48,7 +47,6 @@ const app = new Elysia()
         );
     }
   })
-  .use(openapi())
   .get("/", () => "Hello Elysia")
   .use(projectsRoute)
   .use(labelsRoute)
