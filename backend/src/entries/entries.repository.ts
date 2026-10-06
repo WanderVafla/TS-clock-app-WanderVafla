@@ -42,8 +42,8 @@ const finishEntier = async (
   tx: TransactionSQL | SQL,
   project_id: number,
 ): Promise<Entiers> => {
-  const query: Entiers[] = await tx`update ${pg(table_name)}
-      set end_time = now()
+  const query: Entiers[] = await tx`update ${tx(table_name)}
+      set end_time = clock_timestamp()
       where project_id = ${project_id}
         and end_time is null
       returning *;`;
