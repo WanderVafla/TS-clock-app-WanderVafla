@@ -39,6 +39,10 @@ const app = new Elysia()
       case "InternalError":
         return respondError(code, error.status, error.message);
 
+      case "NOT_FOUND":
+        set.status = 404;
+        return respondError(code, set.status, error.message);
+      
       default:
         return respondError(
           String(code),
