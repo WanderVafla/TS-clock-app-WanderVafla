@@ -1,5 +1,5 @@
 import { NotFoundError } from "../share/errors";
-import { DatabaseTableNames, pg } from "../share/constants";
+import { DatabaseTableNames, ErrorMessage, pg } from "../share/constants";
 import type {
   CreateEntiers,
   Entiers,
@@ -128,10 +128,10 @@ export const createEntryLabel = async (
 ): Promise<EntryLabelLink> => {
   const query: EntryLabelLink[] =
     await pg`insert into ${pg(link_table_name)} ${pg(link)}
-      on conflict (label_id, time_entry_id) do update set ${pg(link)}  returning *;`;
+      on conflict (label_id, time_entry_id) do nothing returning *;`;
 
   if (query.length === 0) {
-    throw new NotFoundError();
+    throw new NotFoundError(ErrorMessage.AlreadyExists);
   }
 
   return query[0];
