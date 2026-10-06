@@ -23,8 +23,6 @@ export const getEntiers = async (params?: {
           ${id !== undefined ? pg`and id = ${id}` : pg``}
           ${project_id !== undefined ? pg`and project_id = ${project_id}` : pg``}
       ;`;
-
-  if (query.length <= 0 && (id !== undefined || project_id !== undefined)) throw new NotFoundError();
   
   return query;
 };
