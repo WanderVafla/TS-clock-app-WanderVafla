@@ -7,9 +7,11 @@ import {
   createEntier,
   createEntryLabel,
   deleteEntier,
+  deleteEntryLabel,
   getEntiers,
   getEntryLabels,
   updateEntier,
+  updateEntryLabel,
 } from "./entries.repository";
 import {
   type UpdateEntier,
@@ -32,19 +34,6 @@ export const entiersRoute = new Elysia({ prefix: "/entries" })
       }),
     },
   )
-  .get(
-    "/labels",
-    async ({ query, set }) => {
-      const data = await getEntryLabels(query);
-      return respondSuccess(data, set.status);
-    },
-    {
-      query: v.object({
-        label_id: v.optional(idQuerySchema),
-        time_entry_id: v.optional(idQuerySchema),
-      }),
-    },
-  )
   .post(
     "",
     async ({ body, set }) => {
@@ -56,17 +45,7 @@ export const entiersRoute = new Elysia({ prefix: "/entries" })
       body: CreateEntiersSchema,
     },
   )
-  .post(
-    "/labels",
-    async ({ body, set }) => {
-      const data = await createEntryLabel(body);
-      set.status = 201;
-      return respondSuccess(data, set.status);
-    },
-    {
-      body: EntryLabelLinkSchema,
-    },
-  )
+
   .delete(
     "",
     async ({ query: { id }, set }) => {
@@ -89,5 +68,55 @@ export const entiersRoute = new Elysia({ prefix: "/entries" })
     },
     {
       body: UpdateEntiersSchema,
+    },
+  )
+  /* CRUD labels_time_entrie */
+
+  .get(
+    "/labels",
+    async ({ query, set }) => {
+      const data = await getEntryLabels(query);
+      return respondSuccess(data, set.status);
+    },
+    {
+      query: v.object({
+        label_id: v.optional(idQuerySchema),
+        time_entry_id: v.optional(idQuerySchema),
+      }),
+    },
+  )
+  .post(
+    "/labels",
+    async ({ body, set }) => {
+      const data = await createEntryLabel(body);
+      set.status = 201;
+      return respondSuccess(data, set.status);
+    },
+    {
+      body: EntryLabelLinkSchema,
+    },
+  )
+  .delete(
+    "/labels",
+    async ({ query: { id }, set }) => {
+      const data = await deleteEntryLabel(id);
+      set.status = 200;
+      return respondSuccess(data, set.status);
+    },
+    {
+      query: v.object({
+        id: idQuerySchema,
+      }),
+      detail: DescriptionDocs.detailLabelDelete,
+    },
+  )
+  .patch(
+    "/labels",
+    async ({ body, set }) => {
+      const data = await updateEntryLabel(body);
+      return respondSuccess(data, set.status);
+    },
+    {
+      body: EntryLabelLinkSchema,
     },
   );

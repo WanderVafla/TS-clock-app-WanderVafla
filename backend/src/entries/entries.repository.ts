@@ -128,7 +128,31 @@ export const createEntryLabel = async (
 ): Promise<EntryLabelLink> => {
   const query: EntryLabelLink[] =
     await pg`insert into ${pg(link_table_name)} ${pg(link)}
-      on conflict (label_id, time_entry_id) do nothing returning *;`;
+      on conflict (label_id, time_entry_id) do update set ${pg(link)}  returning *;`;
+
+  if (query.length === 0) {
+    throw new NotFoundError();
+  }
+
+  return query[0];
+};
+
+export const deleteEntryLabel = async (id: number): Promise<EntryLabelLink> => {
+  const query: EntryLabelLink[] =
+    await pg`delete ${pg(link_table_name)} where ${pg(id)} returning *;`;
+
+  if (query.length === 0) {
+    throw new NotFoundError();
+  }
+
+  return query[0];
+};
+
+export const updateEntryLabel = async (
+  link: EntryLabelLink,
+): Promise<EntryLabelLink> => {
+  const query: EntryLabelLink[] =
+    await pg`update ${pg(link_table_name)} set ${pg(link)} returning *;`;
 
   if (query.length === 0) {
     throw new NotFoundError();
