@@ -36,7 +36,7 @@ export const EntiersSchema = v.pipe(
         start_time == null ||
         end_time == null ||
         new Date(end_time) >= new Date(start_time),
-      ValidationError.ValueIsLessThatValue("start_time", "end_time", "less"),
+      ValidationError.ValueIsLessThatValue("end_time", "start_time", "less"),
     ),
     ["end_time"],
   ),
