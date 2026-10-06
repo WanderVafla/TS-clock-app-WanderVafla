@@ -6,6 +6,7 @@ import type {
   EntryLabelLink,
   UpdateEntier,
 } from "./entries.schema";
+import type { SQL, TransactionSQL } from "bun";
 
 /*  Table name from Database */
 const table_name = DatabaseTableNames.entiers;
@@ -26,37 +27,41 @@ export const getEntiers = async (params?: {
   return query;
 };
 
-const startEntier = async (entier: CreateEntiers): Promise<Entiers> => {
+const startEntier = async (
+  tx: TransactionSQL | SQL,
+  entier: CreateEntiers,
+): Promise<Entiers> => {
   const query: Entiers[] =
-    await pg`insert into ${pg(table_name)} ${pg(entier)} RETURNING *;`;
+    await tx`insert into ${tx(table_name)} ${tx(entier)} RETURNING *;`;
   return query[0];
 };
 
 const finishEntier = async (
-  id: number,
-  description?: string,
+  tx: TransactionSQL | SQL,
+  project_id: number,
 ): Promise<Entiers> => {
-  const query: Entiers[] =
-    await pg`update ${pg(table_name)} set end_time = now() ${description !== undefined ? pg(description) : pg``} where id = ${id} RETURNING *;`;
+  const query: Entiers[] = await tx`update ${pg(table_name)}
+      set end_time = now()
+      where project_id = ${project_id}
+        and end_time is null
+      returning *;`;
   return query[0];
 };
 
 export const createEntier = async (entier: CreateEntiers): Promise<Entiers> => {
-  const ProjectEntiers = await getEntiers({ project_id: entier.project_id });
+  const { project_id } = entier;
 
-  if (ProjectEntiers.length === 0) {
-    return await startEntier(entier);
-  }
+  return pg.begin(async (tx) => {
+    await tx`select pg_advisory_xact_lock(${entier.project_id})`;
 
-  if (ProjectEntiers.length > 0) {
-    const lastEntier = ProjectEntiers[ProjectEntiers.length - 1];
-    console.log(lastEntier);
-    return !lastEntier.end_time
-      ? await finishEntier(lastEntier.id)
-      : await startEntier(entier);
-  }
+    const finished: Entiers = await finishEntier(tx, project_id);
 
-  return ProjectEntiers[-1];
+    if (finished) return finished;
+
+    const started = await startEntier(tx, entier);
+
+    return started;
+  });
 };
 
 /**
