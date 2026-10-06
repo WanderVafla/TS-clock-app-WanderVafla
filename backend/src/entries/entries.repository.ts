@@ -65,14 +65,13 @@ export const createEntier = async (entier: CreateEntiers): Promise<Entiers> => {
 };
 
 /**
- * Deletes a label by id.
- *
- * Delete behavior (CASCADE on associations): `labels_time_entrie.label_id`
- * references `labels(id) ON DELETE CASCADE` (see `init.sql`), so only the
- * label's associations in the join table are removed together with it.
- * Linked `time_entries` themselves are preserved.
- *
- * @throws NotFoundError (404) when no label with the given id exists.
+* Deletes a time entry by id.
+*
+* `labels_time_entrie.time_entry_id` references `time_entries(id)` with
+* ON DELETE CASCADE, so the entry's label links are also removed.
+* The labels themselves are preserved.
+*
+* @throws NotFoundError (404) when no time entry with the given id exists.
  */
 export const deleteEntier = async (id: number): Promise<{ id: number }> => {
   const query: Entiers[] = await pg`
