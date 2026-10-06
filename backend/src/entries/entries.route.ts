@@ -11,7 +11,6 @@ import {
   getEntiers,
   getEntryLabels,
   updateEntier,
-  updateEntryLabel,
 } from "./entries.repository";
 import {
   type UpdateEntier,
