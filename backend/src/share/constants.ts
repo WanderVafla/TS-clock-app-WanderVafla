@@ -47,6 +47,7 @@ export const ValidationError = {
     comparison: "less" | "more",
   ) => `${firstValue} is ${comparison} that ${secondValue}`,
   NulByteError: "Name must not contain NUL character",
+  DateNotCorrect: 'Date is not correct',
 } as const;
 
 /*

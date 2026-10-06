@@ -21,8 +21,8 @@ const isEndNotBeforeStart = ({ start_time, end_time }: TimeRange) =>
 
 const EntiersBase = v.object({
   id: idQuerySchema,
-  start_time: v.pipe(v.string(), v.isoTimestamp()),
-  end_time: v.nullish(v.pipe(v.string(), v.isoTimestamp())),
+  start_time: v.pipe(v.string(), v.isoTimestamp(ValidationError.DateNotCorrect)),
+  end_time: v.nullish(v.pipe(v.string(), v.isoTimestamp(ValidationError.DateNotCorrect))),
   description: v.nullish(v.pipe(stringSchema)),
   project_id: idQuerySchema,
 });
