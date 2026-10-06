@@ -108,13 +108,3 @@ export const entiersRoute = new Elysia({ prefix: "/entries" })
       detail: DescriptionDocs.detailLabelDelete,
     },
   )
-  .patch(
-    "/labels",
-    async ({ body, set }) => {
-      const data = await updateEntryLabel(body);
-      return respondSuccess(data, set.status);
-    },
-    {
-      body: EntryLabelLinkSchema,
-    },
-  );
