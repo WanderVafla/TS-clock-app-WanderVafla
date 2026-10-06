@@ -17,6 +17,11 @@ const app = new Elysia()
         set.status = 404;
         return respondError("NotFoundError", set.status, "Not found item");
       }
+      
+      if (error.errno === "23514") {
+        set.status = 422;
+        return respondError("VALIDATION", set.status, error.message);
+      }
 
       console.error({ code: error.code, detail: error.detail });
       return respondError("ServerError", 500, "Server Error");
