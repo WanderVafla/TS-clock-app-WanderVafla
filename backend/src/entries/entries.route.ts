@@ -98,15 +98,13 @@ export const entiersRoute = new Elysia({ prefix: "/entries" })
   )
   .delete(
     "/labels",
-    async ({ query: { id }, set }) => {
-      const data = await deleteEntryLabel(id);
+    async ({ query, set }) => {
+      const data = await deleteEntryLabel(query);
       set.status = 200;
       return respondSuccess(data, set.status);
     },
     {
-      query: v.object({
-        id: idQuerySchema,
-      }),
+      query: EntryLabelLinkSchema,
       detail: DescriptionDocs.detailLabelDelete,
     },
   )

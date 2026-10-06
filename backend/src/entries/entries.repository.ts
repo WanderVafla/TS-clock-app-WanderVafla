@@ -137,22 +137,14 @@ export const createEntryLabel = async (
   return query[0];
 };
 
-export const deleteEntryLabel = async (id: number): Promise<EntryLabelLink> => {
-  const query: EntryLabelLink[] =
-    await pg`delete ${pg(link_table_name)} where ${pg(id)} returning *;`;
-
-  if (query.length === 0) {
-    throw new NotFoundError();
-  }
-
-  return query[0];
-};
-
-export const updateEntryLabel = async (
+export const deleteEntryLabel = async (
   link: EntryLabelLink,
 ): Promise<EntryLabelLink> => {
-  const query: EntryLabelLink[] =
-    await pg`update ${pg(link_table_name)} set ${pg(link)} returning *;`;
+  const { label_id, time_entry_id } = link;
+  const query: EntryLabelLink[] = await pg`delete from ${pg(link_table_name)}
+      where label_id = ${label_id}
+        and time_entry_id = ${time_entry_id}
+      returning *;`;
 
   if (query.length === 0) {
     throw new NotFoundError();
