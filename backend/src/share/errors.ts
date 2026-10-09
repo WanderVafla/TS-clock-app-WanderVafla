@@ -5,6 +5,13 @@ export class NotFoundError extends Error {
   }
 }
 
+export class AlreadyExistsError extends Error {
+  status = 409;
+  constructor(message = ErrorMessage.AlreadyExists) {
+    super(message)
+  }
+}  
+
 export class InternalError extends Error {
   status = 500
   constructor(message = "Action not completed") {

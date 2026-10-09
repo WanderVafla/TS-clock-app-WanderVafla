@@ -1,5 +1,5 @@
-import { NotFoundError } from "../share/errors";
-import { DatabaseTableNames, ErrorMessage, pg } from "../share/constants";
+import { AlreadyExistsError, NotFoundError } from "../share/errors";
+import { DatabaseTableNames, pg } from "../share/constants";
 import type {
   CreateEntiers,
   Entiers,
@@ -131,7 +131,7 @@ export const createEntryLabel = async (
       on conflict (label_id, time_entry_id) do nothing returning *;`;
 
   if (query.length === 0) {
-    throw new NotFoundError(ErrorMessage.AlreadyExists);
+    throw new AlreadyExistsError();
   }
 
   return query[0];
