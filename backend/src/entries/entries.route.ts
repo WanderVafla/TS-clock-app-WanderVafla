@@ -8,14 +8,14 @@ import {
   createEntryLabel,
   deleteEntier,
   deleteEntryLabel,
-  getEntiers,
+  getEntries,
   getEntryLabels,
   updateEntier,
 } from "./entries.repository";
 import {
   type UpdateEntier,
-  UpdateEntiersSchema,
-  CreateEntiersSchema,
+  UpdateEntriesSchema,
+  CreateEntriesSchema,
   EntryLabelLinkSchema,
 } from "./entries.schema";
 
@@ -23,7 +23,7 @@ export const entiersRoute = new Elysia({ prefix: "/entries" })
   .get(
     "",
     async ({ query, set }) => {
-      const data = await getEntiers(query);
+      const data = await getEntries(query);
       return respondSuccess(data, set.status);
     },
     {
@@ -41,7 +41,7 @@ export const entiersRoute = new Elysia({ prefix: "/entries" })
       return respondSuccess(data, set.status);
     },
     {
-      body: CreateEntiersSchema,
+      body: CreateEntriesSchema,
     },
   )
 
@@ -66,7 +66,7 @@ export const entiersRoute = new Elysia({ prefix: "/entries" })
       return respondSuccess(updatedLabel, set.status);
     },
     {
-      body: UpdateEntiersSchema,
+      body: UpdateEntriesSchema,
     },
   )
   /* CRUD labels_time_entrie */

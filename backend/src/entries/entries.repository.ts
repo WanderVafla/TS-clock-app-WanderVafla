@@ -1,8 +1,8 @@
 import { AlreadyExistsError, NotFoundError } from "../share/errors";
 import { DatabaseTableNames, pg } from "../share/constants";
 import type {
-  CreateEntiers,
-  Entiers,
+  CreateEntries,
+  Entries,
   EntryLabelLink,
   UpdateEntier,
 } from "./entries.schema";
@@ -12,13 +12,13 @@ import type { SQL, TransactionSQL } from "bun";
 const table_name = DatabaseTableNames.entiers;
 const link_table_name = DatabaseTableNames.entries_labels;
 
-export const getEntiers = async (params?: {
+export const getEntries = async (params?: {
   id?: number;
   project_id?: number;
-}): Promise<Entiers[] | []> => {
+}): Promise<Entries[] | []> => {
   const { id, project_id } = params || {};
 
-  const query: Entiers[] | [] = await pg`select * from ${pg(table_name)}
+  const query: Entries[] | [] = await pg`select * from ${pg(table_name)}
         where true
           ${id !== undefined ? pg`and id = ${id}` : pg``}
           ${project_id !== undefined ? pg`and project_id = ${project_id}` : pg``}
@@ -29,9 +29,9 @@ export const getEntiers = async (params?: {
 
 const startEntier = async (
   tx: TransactionSQL | SQL,
-  entier: CreateEntiers,
-): Promise<Entiers> => {
-  const query: Entiers[] =
+  entier: CreateEntries,
+): Promise<Entries> => {
+  const query: Entries[] =
     await tx`insert into ${tx(table_name)} ${tx(entier)} RETURNING *;`;
   return query[0];
 };
@@ -39,8 +39,8 @@ const startEntier = async (
 const finishEntier = async (
   tx: TransactionSQL | SQL,
   project_id: number,
-): Promise<Entiers> => {
-  const query: Entiers[] = await tx`update ${tx(table_name)}
+): Promise<Entries> => {
+  const query: Entries[] = await tx`update ${tx(table_name)}
       set end_time = clock_timestamp()
       where project_id = ${project_id}
         and end_time is null
@@ -48,13 +48,13 @@ const finishEntier = async (
   return query[0];
 };
 
-export const createEntier = async (entier: CreateEntiers): Promise<Entiers> => {
+export const createEntier = async (entier: CreateEntries): Promise<Entries> => {
   const { project_id } = entier;
 
   return pg.begin(async (tx) => {
     await tx`select pg_advisory_xact_lock(${entier.project_id})`;
 
-    const finished: Entiers = await finishEntier(tx, project_id);
+    const finished: Entries = await finishEntier(tx, project_id);
 
     if (finished) return finished;
 
@@ -74,7 +74,7 @@ export const createEntier = async (entier: CreateEntiers): Promise<Entiers> => {
 * @throws NotFoundError (404) when no time entry with the given id exists.
  */
 export const deleteEntier = async (id: number): Promise<{ id: number }> => {
-  const query: Entiers[] = await pg`
+  const query: Entries[] = await pg`
     delete from ${pg(table_name)}
     where id = ${id}
     returning id;

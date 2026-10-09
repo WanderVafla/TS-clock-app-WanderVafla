@@ -19,7 +19,7 @@ const isEndNotBeforeStart = ({ start_time, end_time }: TimeRange) =>
   end_time == null ||
   new Date(end_time) >= new Date(start_time);
 
-const EntiersBase = v.object({
+const EntriesBase = v.object({
   id: idQuerySchema,
   start_time: v.pipe(v.string(), v.isoTimestamp(ValidationError.DateNotCorrect)),
   end_time: v.nullish(v.pipe(v.string(), v.isoTimestamp(ValidationError.DateNotCorrect))),
@@ -27,8 +27,8 @@ const EntiersBase = v.object({
   project_id: idQuerySchema,
 });
 
-export const EntiersSchema = v.pipe(
-  EntiersBase,
+export const EntriesSchema = v.pipe(
+  EntriesBase,
   v.forward(
     v.partialCheck(
       [["start_time"], ["end_time"]],
@@ -42,17 +42,17 @@ export const EntiersSchema = v.pipe(
   ),
 );
 
-export const CreateEntiersSchema = v.pipe(
+export const CreateEntriesSchema = v.pipe(
   v.object({
-    project_id: EntiersBase.entries.project_id,
-    ...v.partial(v.pick(EntiersBase, FieldColumnNames)).entries,
+    project_id: EntriesBase.entries.project_id,
+    ...v.partial(v.pick(EntriesBase, FieldColumnNames)).entries,
   }),
 );
 
-export const UpdateEntiersSchema = v.pipe(
+export const UpdateEntriesSchema = v.pipe(
   v.object({
-    id: EntiersBase.entries.id,
-    ...v.partial(v.pick(EntiersBase, UpdateDataColumns)).entries,
+    id: EntriesBase.entries.id,
+    ...v.partial(v.pick(EntriesBase, UpdateDataColumns)).entries,
   }),
   v.check(
     (i) => Object.keys(i).some((k) => k !== "id"),
@@ -68,9 +68,9 @@ export const UpdateEntiersSchema = v.pipe(
   ),
 );
 
-export type Entiers = v.InferOutput<typeof EntiersSchema>;
-export type UpdateEntier = v.InferOutput<typeof UpdateEntiersSchema>;
-export type CreateEntiers = v.InferOutput<typeof CreateEntiersSchema>;
+export type Entries = v.InferOutput<typeof EntriesSchema>;
+export type UpdateEntier = v.InferOutput<typeof UpdateEntriesSchema>;
+export type CreateEntries = v.InferOutput<typeof CreateEntriesSchema>;
 
 /* labels_time_entrie */
 
