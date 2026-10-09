@@ -5,6 +5,7 @@ import { labelsRoute } from "./labels/labels.route";
 import { SQL } from "bun";
 import { respondError } from "./share/response";
 import { entiersRoute } from "./entries/entries.route";
+import { ValidationError } from "./share/constants";
 
 const app = new Elysia()
   .error({
@@ -17,13 +18,26 @@ const app = new Elysia()
         set.status = 404;
         return respondError("NotFoundError", set.status, "Not found item");
       }
-      
+
       if (error.errno === "23514") {
         set.status = 422;
-        return respondError("VALIDATION", set.status, error.message);
+        return respondError(
+          "VALIDATION",
+          set.status,
+          ValidationError.ValidationError,
+        );
       }
 
-      console.error({ code: error.code, detail: error.detail });
+      if (error.errno === "22008") {
+        set.status = 422;
+        return respondError(
+          "VALIDATION",
+          set.status,
+          ValidationError.OutRangeDate,
+        );
+      }
+
+      console.error(error);
       return respondError("ServerError", 500, "Server Error");
     }
 
@@ -47,7 +61,7 @@ const app = new Elysia()
       case "NOT_FOUND":
         set.status = 404;
         return respondError(code, set.status, error.message);
-      
+
       default:
         return respondError(
           String(code),
