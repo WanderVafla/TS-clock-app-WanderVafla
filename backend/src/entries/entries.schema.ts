@@ -62,7 +62,7 @@ export const UpdateEntiersSchema = v.pipe(
     v.partialCheck(
       [["start_time"], ["end_time"]],
       isEndNotBeforeStart,
-      ValidationError.ValueIsLessThatValue("start_time", "end_time", "less"),
+      ValidationError.ValueIsLessThatValue("end_time", "start_time", "less"),
     ),
     ["end_time"],
   ),
