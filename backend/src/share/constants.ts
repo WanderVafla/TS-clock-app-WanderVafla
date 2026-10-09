@@ -48,6 +48,8 @@ export const ValidationError = {
   ) => `${firstValue} is ${comparison} than ${secondValue}`,
   NulByteError: "Name must not contain NUL character",
   DateNotCorrect: "Date is not correct",
+  OutRangeDate: "Date is out of range",
+  ValidationError: "The field data is incorrect",
 } as const;
 
 /*
@@ -68,5 +70,6 @@ export const DatabaseTableNames = {
 
 export const ErrorMessage = {
   NotFoundError: "Not found item",
-  AlreadyExists: "The element already exists.",
+  AlreadyExists: "Already exists",
+  InternalError: "Action not completed",
 } as const;
