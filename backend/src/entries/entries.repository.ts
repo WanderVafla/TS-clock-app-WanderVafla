@@ -9,7 +9,7 @@ import type {
 import type { SQL, TransactionSQL } from "bun";
 
 /*  Table name from Database */
-const table_name = DatabaseTableNames.entiers;
+const table_name = DatabaseTableNames.entries;
 const link_table_name = DatabaseTableNames.entries_labels;
 
 export const getEntries = async (params?: {

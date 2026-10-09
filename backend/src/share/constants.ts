@@ -64,7 +64,7 @@ export const NamesLength = {
 export const DatabaseTableNames = {
   labels: "labels",
   project: "projects",
-  entiers: "time_entries",
+  entries: "time_entries",
   entries_labels: "labels_time_entrie",
 } as const;
 

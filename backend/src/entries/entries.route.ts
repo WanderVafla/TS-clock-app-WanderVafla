@@ -19,7 +19,7 @@ import {
   EntryLabelLinkSchema,
 } from "./entries.schema";
 
-export const entiersRoute = new Elysia({ prefix: "/entries" })
+export const entriesRoute = new Elysia({ prefix: "/entries" })
   .get(
     "",
     async ({ query, set }) => {

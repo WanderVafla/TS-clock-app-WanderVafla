@@ -4,7 +4,7 @@ import { projectsRoute } from "./projects/projects.route";
 import { labelsRoute } from "./labels/labels.route";
 import { SQL } from "bun";
 import { respondError } from "./share/response";
-import { entiersRoute } from "./entries/entries.route";
+import { entriesRoute } from "./entries/entries.route";
 import { ValidationError } from "./share/constants";
 
 const app = new Elysia()
@@ -73,7 +73,7 @@ const app = new Elysia()
   .get("/", () => "Hello Elysia")
   .use(projectsRoute)
   .use(labelsRoute)
-  .use(entiersRoute)
+  .use(entriesRoute)
   .listen({
     port: 8000,
     hostname: "0.0.0.0",
