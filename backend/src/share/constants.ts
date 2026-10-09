@@ -35,10 +35,21 @@ export const ValidationError = {
   NumberMustBePositive: (field: string) =>
     `${field} must be a positive integer (>= 1)`,
   NumberMustBeInteger: (field: string) => `${field} must be an integer`,
+  NumberTooLarge: (field: string, max: number) =>
+    `${field} must be at most ${max}`,
   // if number is like string
   NumberMustBeNumber: (field: string) => `${field} must be a number`,
   ValueMustBeStringToFirst: (field: string) =>
     `${field} must be a string at first`,
+  ValueIsLessThatValue: (
+    firstValue: string,
+    secondValue: string,
+    comparison: "less" | "more",
+  ) => `${firstValue} is ${comparison} than ${secondValue}`,
+  NulByteError: "Name must not contain NUL character",
+  DateNotCorrect: "Date is not correct",
+  OutRangeDate: "Date is out of range",
+  ValidationError: "The field data is incorrect",
 } as const;
 
 /*
@@ -53,8 +64,12 @@ export const NamesLength = {
 export const DatabaseTableNames = {
   labels: "labels",
   project: "projects",
+  entries: "time_entries",
+  entries_labels: "labels_time_entrie",
 } as const;
 
 export const ErrorMessage = {
   NotFoundError: "Not found item",
+  AlreadyExists: "Already exists",
+  InternalError: "Action not completed",
 } as const;

@@ -6,7 +6,7 @@ create table if not exists projects (
 
 create table if not exists time_entries (
     id int generated always as identity primary key,
-    start_time timestamptz not null,
+    start_time timestamptz not null default clock_timestamp(),
     end_time timestamptz check (end_time >= start_time),
     description varchar(255),
     project_id int not null,

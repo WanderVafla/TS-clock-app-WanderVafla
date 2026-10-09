@@ -37,7 +37,7 @@ export const createProjects = async (
  */
 export const deleteProject = async (
   id: number,
-): Promise<projectsType.Project> => {
+): Promise<{id: number}> => {
   const query: projectsType.Project[] = await pg`
     delete from ${pg(table_name)}
     where id = ${id}

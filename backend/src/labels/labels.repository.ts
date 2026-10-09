@@ -22,14 +22,14 @@ export const createLabel = async (label: Omit<Label, "id">): Promise<Label> => {
 };
 
 /**
- * Deletes a label by id.
- *
- * Delete behavior (CASCADE on associations): `labels_time_entrie.label_id`
- * references `labels(id) ON DELETE CASCADE` (see `init.sql`), so only the
- * label's associations in the join table are removed together with it.
- * Linked `time_entries` themselves are preserved.
- *
- * @throws NotFoundError (404) when no label with the given id exists.
+* Deletes a label by id.
+*
+* Delete behavior (CASCADE on associations): `labels_time_entrie.label_id`
+* references `labels(id) ON DELETE CASCADE` (see `init.sql`), so only the
+* label's associations in the join table are removed together with it.
+* Linked `time_entries` themselves are preserved.
+*
+* @throws NotFoundError (404) when no label with the given id exists.
  */
 export const deleteLabel = async (id: number): Promise<{ id: number }> => {
   const query: Label[] = await pg`
