@@ -84,9 +84,10 @@ Requires installed dependencies (`node_modules`) in both `backend/` and `fronten
 
 ### `scripts/seed-entries.sh`
 
-Sends POST requests to `/entries` to fill the database with test time entries.
-It prints every failed request with its HTTP code and a summary at the end,
-and exits non-zero if any request failed.
+Fills the database with finished test time entries through `POST /entries`.
+That endpoint toggles the project's timer, so every entry takes two requests:
+start (`201`) and stop (`200`). The script prints every failed entry with its
+HTTP code and a summary at the end, and exits non-zero if any entry failed.
 
 ```bash
 scripts/seed-entries.sh                              # 100 entries, project_id=1
@@ -96,9 +97,11 @@ BASE_URL=http://localhost:3000 scripts/seed-entries.sh
 
 | Argument / env | Default                 | Meaning                         |
 | -------------- | ----------------------- | ------------------------------- |
-| `$1`           | `100`                   | number of requests              |
+| `$1`           | `100`                   | number of entries               |
 | `$2`           | `1`                     | `project_id` for every entry    |
 | `BASE_URL`     | `http://localhost:8000` | backend address                 |
 
 The backend must be running, and a project with the given `project_id` must
 already exist. Otherwise every request fails because of the foreign key.
+If the project has a running timer, the script stops before sending anything,
+so it never closes a real timer.
