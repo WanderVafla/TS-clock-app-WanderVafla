@@ -77,7 +77,7 @@ const finishEntier = async (
   return query[0];
 };
 
-export const createEntier = async (entier: CreateEntries): Promise<Entries> => {
+export const createEntier = async (entier: CreateEntries): Promise<[Entries, boolean]> => {
   const { project_id } = entier;
 
   return pg.begin(async (tx) => {
@@ -85,11 +85,11 @@ export const createEntier = async (entier: CreateEntries): Promise<Entries> => {
 
     const finished: Entries = await finishEntier(tx, project_id);
 
-    if (finished) return finished;
+    if (finished) return [finished, false];
 
     const started = await startEntier(tx, entier);
 
-    return started;
+    return [started, true];
   });
 };
 

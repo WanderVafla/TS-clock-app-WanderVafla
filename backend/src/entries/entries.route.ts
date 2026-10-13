@@ -34,8 +34,8 @@ export const entriesRoute = new Elysia({ prefix: "/entries" })
   .post(
     "",
     async ({ body, set }) => {
-      const data = await createEntier(body);
-      set.status = 201;
+      const [data, created] = await createEntier(body);
+      set.status = created ? 201 : 200;
       return respondSuccess(data, set.status);
     },
     {
