@@ -19,23 +19,23 @@ export const getEntries = async (
 ): Promise<[Entries[], Metadata]> => {
   const { id, project_id, page, sizePage, order } = params || {};
 
-  const standartOrder = "start_time";
+  const standartOrder = "start_time" as const;
   const currentPage = sizePage !== undefined ? (page ?? 1) : undefined;
 
   return pg.begin("isolation level repeatable read", async (tx) => {
     const query: Entries[] = await tx`select * from ${tx(table_name)}
         where true
-          ${id !== undefined ? tx`and id = ${id}` : tx``}
-          ${project_id !== undefined ? tx`and project_id = ${project_id}` : tx``}
+          ${id ? tx`and id = ${id}` : tx``}
+          ${project_id ? tx`and project_id = ${project_id}` : tx``}
           order by ${tx(order ?? standartOrder)}, id
-          ${currentPage !== undefined && sizePage !== undefined ? tx`limit ${sizePage} offset ${(currentPage - 1) * sizePage}` : tx``}
+          ${currentPage && sizePage ? tx`limit ${sizePage} offset ${(currentPage - 1) * sizePage}` : tx``}
       ;`;
 
     const [{ total }] = await tx`
     select count(*)::int as total from ${tx(table_name)}
     where true
-      ${id !== undefined ? tx`and id = ${id}` : tx``}
-      ${project_id !== undefined ? tx`and project_id = ${project_id}` : tx``}
+      ${id ? tx`and id = ${id}` : tx``}
+      ${project_id ? tx`and project_id = ${project_id}` : tx``}
     ;
     `;
 
