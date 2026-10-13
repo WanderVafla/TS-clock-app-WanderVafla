@@ -1,5 +1,9 @@
 import * as v from "valibot";
-import { idQuerySchema, stringSchema } from "../share/schema";
+import {
+  idQuerySchema,
+  paginationParamsSchema,
+  stringSchema,
+} from "../share/schema";
 import { ValidationError } from "../share/constants";
 
 type TimeRange = {
@@ -72,10 +76,30 @@ export const UpdateEntriesSchema = v.pipe(
   ),
 );
 
+export const QueryParamsGetEntriesSchema = v.pipe(
+  v.object({
+    id: v.optional(idQuerySchema),
+    project_id: v.optional(idQuerySchema),
+    ...paginationParamsSchema.entries,
+    order: v.optional(v.pipe(stringSchema, v.keyof(EntriesBase)))
+    
+  }),
+  v.forward(
+    v.partialCheck(
+      [["page"], ["sizePage"]],
+      (input) => input.page === undefined || input.sizePage !== undefined,
+      ValidationError.HaveRequireFields(["sizePage"]),
+    ),
+    ["page"],
+  ),
+);
+
 export type Entries = v.InferOutput<typeof EntriesSchema>;
 export type UpdateEntier = v.InferOutput<typeof UpdateEntriesSchema>;
 export type CreateEntries = v.InferOutput<typeof CreateEntriesSchema>;
-
+export type QueryParamsGetEntries = v.InferOutput<
+  typeof QueryParamsGetEntriesSchema
+>;
 /* labels_time_entrie */
 
 export const EntryLabelLinkSchema = v.object({

@@ -4,27 +4,50 @@ import type {
   CreateEntries,
   Entries,
   EntryLabelLink,
+  QueryParamsGetEntries,
   UpdateEntier,
 } from "./entries.schema";
 import type { SQL, TransactionSQL } from "bun";
+import type { Metadata } from "../share/schema";
 
 /*  Table name from Database */
 const table_name = DatabaseTableNames.entries;
 const link_table_name = DatabaseTableNames.entries_labels;
 
-export const getEntries = async (params?: {
-  id?: number;
-  project_id?: number;
-}): Promise<Entries[] | []> => {
-  const { id, project_id } = params || {};
+export const getEntries = async (
+  params?: QueryParamsGetEntries,
+): Promise<[Entries[], Metadata]> => {
+  const { id, project_id, page, sizePage, order } = params || {};
 
-  const query: Entries[] | [] = await pg`select * from ${pg(table_name)}
+  const standartOrder = "start_time";
+  const currentPage = sizePage !== undefined ? (page ?? 1) : undefined;
+
+  const query: Entries[] = await pg`select * from ${pg(table_name)}
         where true
           ${id !== undefined ? pg`and id = ${id}` : pg``}
           ${project_id !== undefined ? pg`and project_id = ${project_id}` : pg``}
+        order by ${pg(order ?? standartOrder)}, id
+        ${currentPage !== undefined && sizePage !== undefined ? pg`limit ${sizePage} offset ${(currentPage - 1) * sizePage}` : pg``}
       ;`;
-  
-  return query;
+
+  const [{ total }] = await pg`
+    select count(*)::int as total from ${pg(table_name)}
+    where true
+      ${id !== undefined ? pg`and id = ${id}` : pg``}
+      ${project_id !== undefined ? pg`and project_id = ${project_id}` : pg``}
+    ;
+    `;
+
+  const metadata: Metadata = {
+    page: currentPage,
+    sizePage,
+    total,
+    totalPages:
+      sizePage !== undefined ? Math.ceil(total / sizePage) : total > 0 ? 1 : 0,
+    sorted: order ?? standartOrder,
+  };
+
+  return [query, metadata];
 };
 
 const startEntier = async (

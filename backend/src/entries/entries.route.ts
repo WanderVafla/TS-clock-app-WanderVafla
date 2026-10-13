@@ -17,20 +17,18 @@ import {
   UpdateEntriesSchema,
   CreateEntriesSchema,
   EntryLabelLinkSchema,
+  QueryParamsGetEntriesSchema,
 } from "./entries.schema";
 
 export const entriesRoute = new Elysia({ prefix: "/entries" })
   .get(
     "",
     async ({ query, set }) => {
-      const data = await getEntries(query);
-      return respondSuccess(data, set.status);
+      const [data, metadata] = await getEntries(query);
+      return respondSuccess(data, set.status, metadata);
     },
     {
-      query: v.object({
-        id: v.optional(idQuerySchema),
-        project_id: v.optional(idQuerySchema),
-      }),
+      query: QueryParamsGetEntriesSchema,
     },
   )
   .post(
