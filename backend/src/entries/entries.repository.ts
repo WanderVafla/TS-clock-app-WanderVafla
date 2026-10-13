@@ -65,13 +65,13 @@ export const createEntier = async (entier: CreateEntries): Promise<Entries> => {
 };
 
 /**
-* Deletes a time entry by id.
-*
-* `labels_time_entrie.time_entry_id` references `time_entries(id)` with
-* ON DELETE CASCADE, so the entry's label links are also removed.
-* The labels themselves are preserved.
-*
-* @throws NotFoundError (404) when no time entry with the given id exists.
+ * Deletes a time entry by id.
+ *
+ * `labels_time_entrie.time_entry_id` references `time_entries(id)` with
+ * ON DELETE CASCADE, so the entry's label links are also removed.
+ * The labels themselves are preserved.
+ *
+ * @throws NotFoundError (404) when no time entry with the given id exists.
  */
 export const deleteEntier = async (id: number): Promise<{ id: number }> => {
   const query: Entries[] = await pg`

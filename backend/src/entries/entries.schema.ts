@@ -6,7 +6,6 @@ type TimeRange = {
   start_time?: string | null;
   end_time?: string | null;
 };
-
 const FieldColumnNames = ["description"] as const;
 const UpdateDataColumns = [
   ...FieldColumnNames,
@@ -21,8 +20,13 @@ const isEndNotBeforeStart = ({ start_time, end_time }: TimeRange) =>
 
 const EntriesBase = v.object({
   id: idQuerySchema,
-  start_time: v.pipe(v.string(), v.isoTimestamp(ValidationError.DateNotCorrect)),
-  end_time: v.nullish(v.pipe(v.string(), v.isoTimestamp(ValidationError.DateNotCorrect))),
+  start_time: v.pipe(
+    v.string(),
+    v.isoTimestamp(ValidationError.DateNotCorrect),
+  ),
+  end_time: v.nullish(
+    v.pipe(v.string(), v.isoTimestamp(ValidationError.DateNotCorrect)),
+  ),
   description: v.nullish(v.pipe(stringSchema)),
   project_id: idQuerySchema,
 });
