@@ -22,32 +22,38 @@ export const getEntries = async (
   const standartOrder = "start_time";
   const currentPage = sizePage !== undefined ? (page ?? 1) : undefined;
 
-  const query: Entries[] = await pg`select * from ${pg(table_name)}
+  return pg.begin("isolation level repeatable read", async (tx) => {
+    const query: Entries[] = await tx`select * from ${tx(table_name)}
         where true
-          ${id !== undefined ? pg`and id = ${id}` : pg``}
-          ${project_id !== undefined ? pg`and project_id = ${project_id}` : pg``}
-        order by ${pg(order ?? standartOrder)}, id
-        ${currentPage !== undefined && sizePage !== undefined ? pg`limit ${sizePage} offset ${(currentPage - 1) * sizePage}` : pg``}
+          ${id !== undefined ? tx`and id = ${id}` : tx``}
+          ${project_id !== undefined ? tx`and project_id = ${project_id}` : tx``}
+          order by ${tx(order ?? standartOrder)}, id
+          ${currentPage !== undefined && sizePage !== undefined ? tx`limit ${sizePage} offset ${(currentPage - 1) * sizePage}` : tx``}
       ;`;
 
-  const [{ total }] = await pg`
-    select count(*)::int as total from ${pg(table_name)}
+    const [{ total }] = await tx`
+    select count(*)::int as total from ${tx(table_name)}
     where true
-      ${id !== undefined ? pg`and id = ${id}` : pg``}
-      ${project_id !== undefined ? pg`and project_id = ${project_id}` : pg``}
+      ${id !== undefined ? tx`and id = ${id}` : tx``}
+      ${project_id !== undefined ? tx`and project_id = ${project_id}` : tx``}
     ;
     `;
 
-  const metadata: Metadata = {
-    page: currentPage,
-    sizePage,
-    total,
-    totalPages:
-      sizePage !== undefined ? Math.ceil(total / sizePage) : total > 0 ? 1 : 0,
-    sorted: order ?? standartOrder,
-  };
+    const metadata: Metadata = {
+      page: currentPage,
+      sizePage,
+      total,
+      totalPages:
+        sizePage !== undefined
+          ? Math.ceil(total / sizePage)
+          : total > 0
+            ? 1
+            : 0,
+      sorted: order ?? standartOrder,
+    };
 
-  return [query, metadata];
+    return [query, metadata];
+  });
 };
 
 const startEntier = async (
