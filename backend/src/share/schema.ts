@@ -2,8 +2,8 @@ import * as v from "valibot";
 import { NamesLength, ValidationError } from "./constants";
 
 const fieldColumn = "id" as const;
-const PG_INT4_MAX = 2147483647; // Max postgres number 
-
+const PG_INT4_MAX = 2147483647 as const; // Max postgres number
+const MaxSizePage = 100 as const;
 /* Schema check all id from routing */
 
 export const idQuerySchema = v.pipe(
@@ -31,3 +31,28 @@ export const stringSchema = v.pipe(
   v.maxLength(NamesLength.max),
   v.check((s) => !s.includes("\0"), ValidationError.NulByteError),
 );
+
+export const paginationParamsSchema = v.object({
+  page: v.optional(idQuerySchema),
+  sizePage: v.optional(
+    v.pipe(
+      idQuerySchema,
+      v.maxValue(
+        MaxSizePage,
+        ValidationError.OutSizeRange("sizePage", MaxSizePage),
+      ),
+    ),
+  ),
+});
+
+const metadataSchema = v.optional(
+  v.object({
+    page: v.optional(idQuerySchema),
+    sizePage: v.optional(idQuerySchema),
+    total: v.optional(v.number()),
+    totalPages: v.optional(v.number()),
+    sorted: v.optional(stringSchema),
+  }),
+);
+
+export type Metadata = v.InferOutput<typeof metadataSchema>;

@@ -4,27 +4,56 @@ import type {
   CreateEntries,
   Entries,
   EntryLabelLink,
+  QueryParamsGetEntries,
   UpdateEntier,
 } from "./entries.schema";
 import type { SQL, TransactionSQL } from "bun";
+import type { Metadata } from "../share/schema";
 
 /*  Table name from Database */
 const table_name = DatabaseTableNames.entries;
 const link_table_name = DatabaseTableNames.entries_labels;
 
-export const getEntries = async (params?: {
-  id?: number;
-  project_id?: number;
-}): Promise<Entries[] | []> => {
-  const { id, project_id } = params || {};
+export const getEntries = async (
+  params?: QueryParamsGetEntries,
+): Promise<[Entries[], Metadata]> => {
+  const { id, project_id, page, sizePage, order } = params || {};
 
-  const query: Entries[] | [] = await pg`select * from ${pg(table_name)}
+  const standartOrder = "start_time" as const;
+  const currentPage = sizePage !== undefined ? (page ?? 1) : undefined;
+
+  return pg.begin("isolation level repeatable read", async (tx) => {
+    const query: Entries[] = await tx`select * from ${tx(table_name)}
         where true
-          ${id !== undefined ? pg`and id = ${id}` : pg``}
-          ${project_id !== undefined ? pg`and project_id = ${project_id}` : pg``}
+          ${id ? tx`and id = ${id}` : tx``}
+          ${project_id ? tx`and project_id = ${project_id}` : tx``}
+          order by ${tx(order ?? standartOrder)}, id
+          ${currentPage && sizePage ? tx`limit ${sizePage} offset ${(currentPage - 1) * sizePage}` : tx``}
       ;`;
-  
-  return query;
+
+    const [{ total }] = await tx`
+    select count(*)::int as total from ${tx(table_name)}
+    where true
+      ${id ? tx`and id = ${id}` : tx``}
+      ${project_id ? tx`and project_id = ${project_id}` : tx``}
+    ;
+    `;
+
+    const metadata: Metadata = {
+      page: currentPage,
+      sizePage,
+      total,
+      totalPages:
+        sizePage !== undefined
+          ? Math.ceil(total / sizePage)
+          : total > 0
+            ? 1
+            : 0,
+      sorted: order ?? standartOrder,
+    };
+
+    return [query, metadata];
+  });
 };
 
 const startEntier = async (
@@ -48,7 +77,7 @@ const finishEntier = async (
   return query[0];
 };
 
-export const createEntier = async (entier: CreateEntries): Promise<Entries> => {
+export const createEntier = async (entier: CreateEntries): Promise<[Entries, boolean]> => {
   const { project_id } = entier;
 
   return pg.begin(async (tx) => {
@@ -56,22 +85,22 @@ export const createEntier = async (entier: CreateEntries): Promise<Entries> => {
 
     const finished: Entries = await finishEntier(tx, project_id);
 
-    if (finished) return finished;
+    if (finished) return [finished, false];
 
     const started = await startEntier(tx, entier);
 
-    return started;
+    return [started, true];
   });
 };
 
 /**
-* Deletes a time entry by id.
-*
-* `labels_time_entrie.time_entry_id` references `time_entries(id)` with
-* ON DELETE CASCADE, so the entry's label links are also removed.
-* The labels themselves are preserved.
-*
-* @throws NotFoundError (404) when no time entry with the given id exists.
+ * Deletes a time entry by id.
+ *
+ * `labels_time_entrie.time_entry_id` references `time_entries(id)` with
+ * ON DELETE CASCADE, so the entry's label links are also removed.
+ * The labels themselves are preserved.
+ *
+ * @throws NotFoundError (404) when no time entry with the given id exists.
  */
 export const deleteEntier = async (id: number): Promise<{ id: number }> => {
   const query: Entries[] = await pg`

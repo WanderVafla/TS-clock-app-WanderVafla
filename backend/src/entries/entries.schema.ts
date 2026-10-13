@@ -1,12 +1,15 @@
 import * as v from "valibot";
-import { idQuerySchema, stringSchema } from "../share/schema";
+import {
+  idQuerySchema,
+  paginationParamsSchema,
+  stringSchema,
+} from "../share/schema";
 import { ValidationError } from "../share/constants";
 
 type TimeRange = {
   start_time?: string | null;
   end_time?: string | null;
 };
-
 const FieldColumnNames = ["description"] as const;
 const UpdateDataColumns = [
   ...FieldColumnNames,
@@ -21,8 +24,13 @@ const isEndNotBeforeStart = ({ start_time, end_time }: TimeRange) =>
 
 const EntriesBase = v.object({
   id: idQuerySchema,
-  start_time: v.pipe(v.string(), v.isoTimestamp(ValidationError.DateNotCorrect)),
-  end_time: v.nullish(v.pipe(v.string(), v.isoTimestamp(ValidationError.DateNotCorrect))),
+  start_time: v.pipe(
+    v.string(),
+    v.isoTimestamp(ValidationError.DateNotCorrect),
+  ),
+  end_time: v.nullish(
+    v.pipe(v.string(), v.isoTimestamp(ValidationError.DateNotCorrect)),
+  ),
   description: v.nullish(v.pipe(stringSchema)),
   project_id: idQuerySchema,
 });
@@ -68,10 +76,30 @@ export const UpdateEntriesSchema = v.pipe(
   ),
 );
 
+export const QueryParamsGetEntriesSchema = v.pipe(
+  v.object({
+    id: v.optional(idQuerySchema),
+    project_id: v.optional(idQuerySchema),
+    ...paginationParamsSchema.entries,
+    order: v.optional(v.pipe(stringSchema, v.keyof(EntriesBase)))
+    
+  }),
+  v.forward(
+    v.partialCheck(
+      [["page"], ["sizePage"]],
+      (input) => input.page === undefined || input.sizePage !== undefined,
+      ValidationError.HaveRequireFields(["sizePage"]),
+    ),
+    ["page"],
+  ),
+);
+
 export type Entries = v.InferOutput<typeof EntriesSchema>;
 export type UpdateEntier = v.InferOutput<typeof UpdateEntriesSchema>;
 export type CreateEntries = v.InferOutput<typeof CreateEntriesSchema>;
-
+export type QueryParamsGetEntries = v.InferOutput<
+  typeof QueryParamsGetEntriesSchema
+>;
 /* labels_time_entrie */
 
 export const EntryLabelLinkSchema = v.object({

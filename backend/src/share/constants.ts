@@ -46,10 +46,13 @@ export const ValidationError = {
     secondValue: string,
     comparison: "less" | "more",
   ) => `${firstValue} is ${comparison} than ${secondValue}`,
+  HaveRequireFields: (field: string[]) =>
+    `Missing required ${field.length > 1 ? 'fields' : 'field'}: ${field.join(", ")}`,
   NulByteError: "Name must not contain NUL character",
   DateNotCorrect: "Date is not correct",
   OutRangeDate: "Date is out of range",
   ValidationError: "The field data is incorrect",
+  OutSizeRange: (column: string, value: number): string => `${column} must not exceed ${value}`,
 } as const;
 
 /*
