@@ -16,6 +16,55 @@ cd TS-clock-app-WanderVafla
 git clone git@github.com:WanderVafla/TS-clock-backend-tests-endpoints.git backend/tests/contract
 ```
 
+## API
+
+### `GET /entries`
+
+Returns time entries. Without pagination parameters it returns all matching
+entries; with `sizePage` it returns a single page.
+
+#### Query parameters
+
+| Parameter    | Type    | Default      | Description                                                        |
+| ------------ | ------- | ------------ | ------------------------------------------------------------------ |
+| `id`         | integer | -            | Return only the entry with this id                                 |
+| `project_id` | integer | -            | Return only entries of this project                                |
+| `page`       | integer | `1`          | Page number, starts at 1. Requires `sizePage`                      |
+| `sizePage`   | integer | -            | Entries per page, from 1 to 100. Enables pagination                |
+| `order`      | string  | `start_time` | Sort column: `id`, `start_time`, `end_time`, `description`, `project_id` |
+
+- Sorting is always ascending. Entries with the same value in the sort column
+  are ordered by `id`, so pages stay stable between requests.
+- `page` without `sizePage`, `sizePage` above 100, a value below 1 or an
+  unknown `order` column returns `422`.
+- A `page` after the last page returns an empty `data` array with `200`.
+
+#### Response (example)
+
+```bash
+curl "http://localhost:8000/entries?page=2&sizePage=2"
+```
+
+```json
+{
+  "success": true,
+  "status": 200,
+  "data": [
+    { "id": 97, "start_time": "2026-10-06T08:54:45.000Z", "end_time": "2026-10-09T09:16:26.335Z", "description": null, "project_id": 2 },
+    { "id": 98, "start_time": "2026-10-09T09:16:26.350Z", "end_time": "2026-10-09T09:16:26.364Z", "description": "seed entry #2", "project_id": 2 }
+  ],
+  "metadata": { "page": 2, "sizePage": 2, "total": 53, "totalPages": 27, "sorted": "start_time" }
+}
+```
+
+| `metadata` field | Description                                                               |
+| ---------------- | ------------------------------------------------------------------------- |
+| `page`           | Current page. Absent without `sizePage`                                   |
+| `sizePage`       | Entries per page. Absent without `sizePage`                               |
+| `total`          | Number of entries that match the filters, across all pages               |
+| `totalPages`     | `ceil(total / sizePage)`; without `sizePage`: `1`, or `0` if `total` is 0 |
+| `sorted`         | Column used for sorting                                                   |
+
 ## Scripts
 
 Helper scripts live in `scripts/`. Run them from the repo root.
