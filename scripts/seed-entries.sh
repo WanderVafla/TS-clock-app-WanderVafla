@@ -36,7 +36,12 @@ if [[ -n "${START:-}" ]]; then
   first=$(date -u -d "$START" +%s)
 else
   # GET /entries sorts by start_time ascending, so the first entry is the earliest.
-  earliest=$(curl -sf "$URL?sizePage=1" | grep -o '"start_time":"[^"]*"' | head -1 | cut -d'"' -f4)
+  first_page=$(curl -sf "$URL?sizePage=1") || {
+    echo "cannot read entries from $URL"
+    exit 1
+  }
+  # An empty table has no start_time; grep then fails, which is not an error here.
+  earliest=$(grep -o '"start_time":"[^"]*"' <<<"$first_page" | head -1 | cut -d'"' -f4 || true)
   if [[ -n "$earliest" ]]; then
     anchor=$(hour_floor "$(date -u -d "$earliest" +%s)")
   else
