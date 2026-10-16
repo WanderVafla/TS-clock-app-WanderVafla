@@ -52,7 +52,10 @@ export const clockChangeProject = async (
 
     const [opened]: Entries[] = await tx`insert into ${tx(table_name)} ${tx({
       project_id: fields.project_id ?? closed.project_id,
-      description: fields.description ?? closed.description,
+      description:
+        fields.description === undefined
+          ? closed.description
+          : fields.description,
       start_time: `now()`,
     })} returning *;`;
 
