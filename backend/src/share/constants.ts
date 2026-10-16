@@ -58,6 +58,7 @@ export const ValidationError = {
   ValidationError: "The field data is incorrect",
   OutSizeRange: (column: string, value: number): string =>
     `${column} must not exceed ${value}`,
+  StartTimeInFuture: "start_time of a running entry must not be in the future",
 } as const;
 
 /*

@@ -28,7 +28,9 @@ export const EntriesBase = v.object({
     v.string(),
     v.isoTimestamp(ValidationError.DateNotCorrect),
   ),
-  end_time: v.pipe(v.string(), v.isoTimestamp(ValidationError.DateNotCorrect)),
+  end_time: v.nullish(
+    v.pipe(v.string(), v.isoTimestamp(ValidationError.DateNotCorrect)),
+  ),
   description: v.nullish(v.pipe(stringSchema)),
   project_id: idQuerySchema,
 });
@@ -56,8 +58,12 @@ export const CreateEntriesSchema = v.pipe(
     start_time: EntriesBase.entries.start_time,
     end_time: EntriesBase.entries.end_time,
     ...v.partial(v.pick(EntriesBase, FieldColumnNames)).entries,
-    label: v.optional(labelIdSchema)
+    label: v.optional(labelIdSchema),
   }),
+  v.check(
+    (i) => i.end_time != null || new Date(i.start_time) <= new Date(),
+    ValidationError.StartTimeInFuture,
+  ),
 );
 
 export const UpdateEntriesSchema = v.pipe(
@@ -102,4 +108,3 @@ export type CreateEntries = v.InferOutput<typeof CreateEntriesSchema>;
 export type QueryParamsGetEntries = v.InferOutput<
   typeof QueryParamsGetEntriesSchema
 >;
-
