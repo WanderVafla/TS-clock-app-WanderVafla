@@ -5,18 +5,14 @@ import { DescriptionDocs } from "../share/constants";
 import { respondSuccess } from "../share/response";
 import {
   createEntier,
-  createEntryLabel,
   deleteEntier,
-  deleteEntryLabel,
   getEntries,
-  getEntryLabels,
   updateEntier,
 } from "./entries.repository";
 import {
   type UpdateEntier,
   UpdateEntriesSchema,
   CreateEntriesSchema,
-  EntryLabelLinkSchema,
   QueryParamsGetEntriesSchema,
 } from "./entries.schema";
 
@@ -66,42 +62,4 @@ export const entriesRoute = new Elysia({ prefix: "/entries" })
     {
       body: UpdateEntriesSchema,
     },
-  )
-  /* CRUD labels_time_entrie */
-
-  .get(
-    "/labels",
-    async ({ query, set }) => {
-      const data = await getEntryLabels(query);
-      return respondSuccess(data, set.status);
-    },
-    {
-      query: v.object({
-        label_id: v.optional(idQuerySchema),
-        time_entry_id: v.optional(idQuerySchema),
-      }),
-    },
-  )
-  .post(
-    "/labels",
-    async ({ body, set }) => {
-      const data = await createEntryLabel(body);
-      set.status = 201;
-      return respondSuccess(data, set.status);
-    },
-    {
-      body: EntryLabelLinkSchema,
-    },
-  )
-  .delete(
-    "/labels",
-    async ({ query, set }) => {
-      const data = await deleteEntryLabel(query);
-      set.status = 200;
-      return respondSuccess(data, set.status);
-    },
-    {
-      query: EntryLabelLinkSchema,
-      detail: DescriptionDocs.detailLabelDelete,
-    },
-  )
+  );

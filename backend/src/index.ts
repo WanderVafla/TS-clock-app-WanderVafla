@@ -10,6 +10,7 @@ import { SQL } from "bun";
 import { respondError } from "./share/response";
 import { entriesRoute } from "./entries/entries.route";
 import { ErrorMessage, ErrorName, ValidationError } from "./share/constants";
+import { entriesLabelsRoute } from "./entries_labels/entries_labels.route";
 
 const app = new Elysia()
   .error({
@@ -114,6 +115,7 @@ const app = new Elysia()
   .use(projectsRoute)
   .use(labelsRoute)
   .use(entriesRoute)
+  .use(entriesLabelsRoute)
   .listen({
     port: 8000,
     hostname: "0.0.0.0",

@@ -100,11 +100,3 @@ export type CreateEntries = v.InferOutput<typeof CreateEntriesSchema>;
 export type QueryParamsGetEntries = v.InferOutput<
   typeof QueryParamsGetEntriesSchema
 >;
-/* labels_time_entrie */
-
-export const EntryLabelLinkSchema = v.object({
-  time_entry_id: idQuerySchema,
-  label_id: idQuerySchema,
-});
-
-export type EntryLabelLink = v.InferOutput<typeof EntryLabelLinkSchema>;
