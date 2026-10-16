@@ -6,5 +6,5 @@
 4. Run `scripts/quality-gate.sh` before splitting into commits. On any failure: stop, report the errors to the user, do nothing further.
 5. Before committing, show the pre-commit plan and wait for user confirmation. The plan contains: task list, commit names with files and changed lines, and a one-line `Why:` rationale per commit (dependency, scope, or layer — why split this way and not otherwise).
 6. Split into sequential commits: each commit's requirements must be in earlier commits.
-7. All messages follow Conventional Commits: `feat|fix|refactor|style|chore(scope): subject`, imperative mood, lowercase scope.
+7. All messages follow Conventional Commits: `feat|fix|refactor|style|docs|chore(scope): subject`, imperative mood, lowercase scope.
 8. Never commit secrets (`.env`); respect `.gitignore`.
