@@ -8,6 +8,10 @@ const pgPort = process.env.DB_PORT;
 const pgUrl =
   `postgres://${pgUser}:${pgPass}@localhost:${pgPort}/${pgName}` as const;
 
+export const Lock_Keys = {
+  clock: 1,
+};
+
 export const pg = new SQL({
   url: pgUrl,
 } as const);
@@ -47,12 +51,14 @@ export const ValidationError = {
     comparison: "less" | "more",
   ) => `${firstValue} is ${comparison} than ${secondValue}`,
   HaveRequireFields: (field: string[]) =>
-    `Missing required ${field.length > 1 ? 'fields' : 'field'}: ${field.join(", ")}`,
+    `Missing required ${field.length > 1 ? "fields" : "field"}: ${field.join(", ")}`,
   NulByteError: "Name must not contain NUL character",
   DateNotCorrect: "Date is not correct",
   OutRangeDate: "Date is out of range",
   ValidationError: "The field data is incorrect",
-  OutSizeRange: (column: string, value: number): string => `${column} must not exceed ${value}`,
+  OutSizeRange: (column: string, value: number): string =>
+    `${column} must not exceed ${value}`,
+  StartTimeInFuture: "start_time of a running entry must not be in the future",
 } as const;
 
 /*
@@ -75,4 +81,13 @@ export const ErrorMessage = {
   NotFoundError: "Not found item",
   AlreadyExists: "Already exists",
   InternalError: "Action not completed",
+  TimerAlreadyRunned: "Timer is already runned",
+  ConflictTime: "Time is into other range",
+  Conflict: "Item already exists",
 } as const;
+
+export const ErrorName = {
+  validation: "VALIDATION",
+  conflict: "Conflict",
+  notFound: "NotFoundError",
+};

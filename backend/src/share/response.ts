@@ -20,7 +20,7 @@ export type ApiSuccessError = {
 export const respondSuccess = <T>(
   data: T,
   status: StatusCode,
-  metadata?: Metadata
+  metadata?: Metadata,
 ): ApiSuccessResponse<T> => ({
   success: true,
   status: status,
