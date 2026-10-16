@@ -1,4 +1,7 @@
-import { NotFoundError } from "../share/errors";
+import {
+  InternalError,
+  NotFoundError,
+} from "../share/errors";
 import { DatabaseTableNames, pg } from "../share/constants";
 import type {
   CreateEntries,
@@ -6,11 +9,12 @@ import type {
   QueryParamsGetEntries,
   UpdateEntier,
 } from "./entries.schema";
-import type { SQL, TransactionSQL } from "bun";
 import type { Metadata } from "../share/schema";
+import { createEntryLabel } from "../entries_labels/entries_labels.repository";
 
 /*  Table name from Database */
 const table_name = DatabaseTableNames.entries;
+
 
 export const getEntries = async (
   params?: QueryParamsGetEntries,
@@ -54,40 +58,27 @@ export const getEntries = async (
   });
 };
 
-const startEntier = async (
-  tx: TransactionSQL | SQL,
-  entier: CreateEntries,
-): Promise<Entries> => {
-  const query: Entries[] =
-    await tx`insert into ${tx(table_name)} ${tx(entier)} RETURNING *;`;
-  return query[0];
-};
-
-const finishEntier = async (
-  tx: TransactionSQL | SQL,
-  project_id: number,
-): Promise<Entries> => {
-  const query: Entries[] = await tx`update ${tx(table_name)}
-      set end_time = clock_timestamp()
-      where project_id = ${project_id}
-        and end_time is null
-      returning *;`;
-  return query[0];
-};
-
-export const createEntier = async (entier: CreateEntries): Promise<[Entries, boolean]> => {
-  const { project_id } = entier;
-
+export const createEntry = async (entry: CreateEntries): Promise<Entries> => {
+  const { label, ...CreateEntries } = entry;
   return pg.begin(async (tx) => {
-    await tx`select pg_advisory_xact_lock(${entier.project_id})`;
+    const query: Entries[] =
+      await tx`insert into ${tx(table_name)} ${tx(CreateEntries)} RETURNING *;`;
 
-    const finished: Entries = await finishEntier(tx, project_id);
+    if (query.length === 0) {
+      throw new InternalError();
+    }
 
-    if (finished) return [finished, false];
+    if (label) {
+      await createEntryLabel(
+        {
+          time_entry_id: query[0].id,
+          label_id: label,
+        },
+        tx,
+      );
+    }
 
-    const started = await startEntier(tx, entier);
-
-    return [started, true];
+    return query[0];
   });
 };
 
@@ -132,3 +123,5 @@ export const updateEntier = async (
 
   return query[0];
 };
+
+

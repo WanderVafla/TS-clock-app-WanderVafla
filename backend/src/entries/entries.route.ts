@@ -4,7 +4,7 @@ import * as v from "valibot";
 import { DescriptionDocs } from "../share/constants";
 import { respondSuccess } from "../share/response";
 import {
-  createEntier,
+  createEntry,
   deleteEntier,
   getEntries,
   updateEntier,
@@ -30,8 +30,8 @@ export const entriesRoute = new Elysia({ prefix: "/entries" })
   .post(
     "",
     async ({ body, set }) => {
-      const [data, created] = await createEntier(body);
-      set.status = created ? 201 : 200;
+      const data = await createEntry(body);
+      set.status = 201;
       return respondSuccess(data, set.status);
     },
     {
@@ -62,4 +62,4 @@ export const entriesRoute = new Elysia({ prefix: "/entries" })
     {
       body: UpdateEntriesSchema,
     },
-  );
+  )

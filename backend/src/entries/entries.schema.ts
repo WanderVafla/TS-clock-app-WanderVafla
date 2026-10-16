@@ -22,18 +22,18 @@ const isEndNotBeforeStart = ({ start_time, end_time }: TimeRange) =>
   end_time == null ||
   new Date(end_time) >= new Date(start_time);
 
-const EntriesBase = v.object({
+export const EntriesBase = v.object({
   id: idQuerySchema,
   start_time: v.pipe(
     v.string(),
     v.isoTimestamp(ValidationError.DateNotCorrect),
   ),
-  end_time: v.nullish(
-    v.pipe(v.string(), v.isoTimestamp(ValidationError.DateNotCorrect)),
-  ),
+  end_time: v.pipe(v.string(), v.isoTimestamp(ValidationError.DateNotCorrect)),
   description: v.nullish(v.pipe(stringSchema)),
   project_id: idQuerySchema,
 });
+
+export const labelIdSchema = idQuerySchema;
 
 export const EntriesSchema = v.pipe(
   EntriesBase,
@@ -53,7 +53,10 @@ export const EntriesSchema = v.pipe(
 export const CreateEntriesSchema = v.pipe(
   v.object({
     project_id: EntriesBase.entries.project_id,
+    start_time: EntriesBase.entries.start_time,
+    end_time: EntriesBase.entries.end_time,
     ...v.partial(v.pick(EntriesBase, FieldColumnNames)).entries,
+    label: v.optional(labelIdSchema)
   }),
 );
 
@@ -81,8 +84,7 @@ export const QueryParamsGetEntriesSchema = v.pipe(
     id: v.optional(idQuerySchema),
     project_id: v.optional(idQuerySchema),
     ...paginationParamsSchema.entries,
-    order: v.optional(v.pipe(stringSchema, v.keyof(EntriesBase)))
-    
+    order: v.optional(v.pipe(stringSchema, v.keyof(EntriesBase))),
   }),
   v.forward(
     v.partialCheck(
@@ -100,3 +102,4 @@ export type CreateEntries = v.InferOutput<typeof CreateEntriesSchema>;
 export type QueryParamsGetEntries = v.InferOutput<
   typeof QueryParamsGetEntriesSchema
 >;
+
