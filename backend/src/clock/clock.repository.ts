@@ -1,6 +1,7 @@
 import type { SQL, TransactionSQL } from "bun";
 import type { Entries } from "../entries/entries.schema";
-import { DatabaseTableNames, Lock_Keys, pg } from "../share/constants";
+import { DatabaseTableNames } from "../share/constants";
+import { Lock_Keys, pg } from "../share/db";
 import { NotFoundError } from "../share/errors";
 import type { ClockChange, ClockIn } from "./clock.schema";
 import { createEntryLabel } from "../entries_labels/entries_labels.repository";

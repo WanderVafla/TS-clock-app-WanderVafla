@@ -1,6 +1,7 @@
 import type { Label, UpdateLabel } from "./labels.schema";
 import { InternalError, NotFoundError } from "../share/errors";
-import { DatabaseTableNames, pg } from "../share/constants";
+import { DatabaseTableNames } from "../share/constants";
+import { pg } from "../share/db";
 
 /*  Table name from Database */
 const table_name = DatabaseTableNames.labels;

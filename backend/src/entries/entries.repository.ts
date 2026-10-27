@@ -2,7 +2,8 @@ import {
   InternalError,
   NotFoundError,
 } from "../share/errors";
-import { DatabaseTableNames, pg } from "../share/constants";
+import { DatabaseTableNames } from "../share/constants";
+import { pg } from "../share/db";
 import type {
   CreateEntries,
   Entries,

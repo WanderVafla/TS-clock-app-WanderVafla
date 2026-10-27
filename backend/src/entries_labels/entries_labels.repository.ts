@@ -1,6 +1,7 @@
 import type { SQL, TransactionSQL } from "bun";
 import type { EntryLabelLink } from "./entries_labels.schema";
-import { DatabaseTableNames, pg } from "../share/constants";
+import { DatabaseTableNames } from "../share/constants";
+import { pg } from "../share/db";
 import { AlreadyExistsError, NotFoundError } from "../share/errors";
 
 const table_name = DatabaseTableNames.entries_labels;
