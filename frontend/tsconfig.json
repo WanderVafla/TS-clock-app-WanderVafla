@@ -20,7 +20,7 @@
 
     /* Import json directly into code */
     "resolveJsonModule": true,
-    
+
     /* Linting */
     "isolatedModules": true,
     "skipLibCheck": true,
