@@ -49,8 +49,8 @@ const metadataSchema = v.optional(
   v.object({
     page: v.optional(idQuerySchema),
     sizePage: v.optional(idQuerySchema),
-    total: v.optional(v.number()),
-    totalPages: v.optional(v.number()),
+    total: v.number(),
+    totalPages: v.number(),
     sorted: v.optional(stringSchema),
   }),
 );
