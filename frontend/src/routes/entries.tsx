@@ -31,7 +31,10 @@ const loadData = async (deps: {
     fetchLabels(),
   ]);
 
-  const entriesLabels = await fetchEntriesLabels(entries.data.map((e) => e.id));
+  const entriesLabels =
+    entries.data.length > 0
+      ? await fetchEntriesLabels(entries.data.map((e) => e.id))
+      : [];
 
   const data = entries.data.map((e) => {
     const mathedProject = projects.data.find((p) => p.id === e.project_id);
