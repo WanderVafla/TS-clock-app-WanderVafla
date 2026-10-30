@@ -12,8 +12,9 @@ import { fetchEntriesLabels } from "#/api/api.entries_labels.ts";
 import { fetchLabels } from "#/api/api.labels.ts";
 import type { Metadata } from "../../../backend/src/share/schema.ts";
 import type { Label } from "../../../backend/src/labels/labels.schema.ts";
-import { PendingConf } from "#/contants/config.ts";
+import { PaginationConf, PendingConf } from "#/contants/config.ts";
 import { Messages } from "#/contants/messages.ts";
+import { range } from "#/action/range.ts";
 
 type LoaderResponse = {
   data: (Entry & { project_name: string } & { labels: Label[] })[];
@@ -121,15 +122,16 @@ function RouteComponent() {
           >
             prev
           </Link>
-          {Array.from({ length: metadata.totalPages }, (_, i) => i + 1).map(
-            (p) => {
-              return (
-                <Link key={p} to="/entries" search={{ page: p, sizePage }}>
-                  {p}
-                </Link>
-              );
-            },
-          )}
+          {range(
+            Math.max(1, page - PaginationConf.delataRange),
+            Math.min(metadata.totalPages, page + PaginationConf.delataRange),
+          ).map((p) => {
+            return (
+              <Link key={p} to="/entries" search={{ page: p, sizePage }}>
+                {p}
+              </Link>
+            );
+          })}
 
           <Link
             to="/entries"
