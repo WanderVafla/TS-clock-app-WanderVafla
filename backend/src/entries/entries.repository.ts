@@ -1,7 +1,4 @@
-import {
-  InternalError,
-  NotFoundError,
-} from "../share/errors";
+import { InternalError, NotFoundError } from "../share/errors";
 import { DatabaseTableNames } from "../share/constants";
 import { pg } from "../share/db";
 import type {
@@ -15,7 +12,6 @@ import { createEntryLabel } from "../entries_labels/entries_labels.repository";
 
 /*  Table name from Database */
 const table_name = DatabaseTableNames.entries;
-
 
 export const getEntries = async (
   params?: QueryParamsGetEntries,
@@ -124,5 +120,3 @@ export const updateEntier = async (
 
   return query[0];
 };
-
-
