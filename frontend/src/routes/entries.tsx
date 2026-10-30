@@ -145,16 +145,17 @@ function RouteComponent() {
 }
 
 function EntryItemComp(entryProp: EntryItem) {
-  const [entry, _] = useState<EntryItem>(entryProp);
+  const { description, project_id, project_name, label, start_time, end_time } =
+    entryProp;
   return (
     <tr>
-      <td>{entry.description}</td>
-      <td id={`${entry.project_id}`}>{entry.project_name}</td>
+      <td>{description}</td>
+      <td id={`${project_id}`}>{project_name}</td>
 
       <td>
-        {entry.label ? (
+        {label ? (
           <div className="flex gap-1.5">
-            {entry.label.map((l) => (
+            {label.map((l) => (
               <div
                 className="p-1.5 flex bg-gray-300 rounded-2xl w-min overflow-hidden"
                 key={l.id}
@@ -168,8 +169,8 @@ function EntryItemComp(entryProp: EntryItem) {
         )}
       </td>
 
-      <td>{entry.start_time}</td>
-      <td>{entry.end_time}</td>
+      <td>{start_time}</td>
+      <td>{end_time}</td>
     </tr>
   );
 }
