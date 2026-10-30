@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
 import { Pending } from "#/componets/Pending.tsx";
 import { ErrorDisplay } from "#/componets/ErrorDisplay.tsx";
 import { fetchEntries } from "#/api/api.entries.ts";
@@ -25,10 +24,13 @@ const loadData = async (deps: {
   page: number;
   sizePage: number;
 }): Promise<LoaderResponse> => {
-  const projects = await fetchProjects();
-  const entries = await fetchEntries(deps);
-  const entriesLabels = await fetchEntriesLabels();
-  const labels = await fetchLabels();
+  const [projects, entries, labels] = await Promise.all([
+    fetchProjects(),
+    fetchEntries(deps),
+    fetchLabels(),
+  ]);
+
+  const entriesLabels = await fetchEntriesLabels(entries.data.map((e) => e.id));
 
   const data = entries.data.map((e) => {
     const mathedProject = projects.data.find((p) => p.id === e.project_id);

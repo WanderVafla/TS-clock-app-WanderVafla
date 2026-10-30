@@ -25,6 +25,14 @@ export const idQuerySchema = v.pipe(
   ),
 );
 
+export const idListQuerySchema = v.pipe(
+  v.union([v.string(), v.array(v.string())]),
+  v.transform((val): (string | number)[] => (Array.isArray(val) ? val : [val])),
+  v.array(idQuerySchema),
+  v.minLength(1),
+  v.maxLength(MaxSizePage),
+);
+
 export const stringSchema = v.pipe(
   v.string(),
   v.trim(),

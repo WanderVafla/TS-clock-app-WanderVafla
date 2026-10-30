@@ -7,15 +7,15 @@ import { AlreadyExistsError, NotFoundError } from "../share/errors";
 const table_name = DatabaseTableNames.entries_labels;
 
 export const getEntryLabels = async (params?: {
-  time_entry_id?: number;
-  label_id?: number;
+  time_entry_id?: number[];
+  label_id?: number[];
 }): Promise<EntryLabelLink[]> => {
   const { time_entry_id, label_id } = params || {};
 
   const query: EntryLabelLink[] = await pg`select * from ${pg(table_name)}
         where true
-          ${time_entry_id !== undefined ? pg`and time_entry_id = ${time_entry_id}` : pg``}
-          ${label_id !== undefined ? pg`and label_id = ${label_id}` : pg``}
+          ${time_entry_id !== undefined && time_entry_id.length > 0 ? pg`and time_entry_id in ${pg(time_entry_id)}` : pg``}
+          ${label_id !== undefined && label_id.length > 0 ? pg`and label_id in ${pg(label_id)}` : pg``}
       ;`;
 
   return query;

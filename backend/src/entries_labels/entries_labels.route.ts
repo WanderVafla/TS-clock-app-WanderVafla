@@ -6,7 +6,7 @@ import {
   getEntryLabels,
 } from "./entries_labels.repository";
 import { respondSuccess } from "../share/response";
-import { idQuerySchema } from "../share/schema";
+import { idListQuerySchema } from "../share/schema";
 import { EntryLabelLinkSchema } from "./entries_labels.schema";
 import { DescriptionDocs } from "../share/constants";
 
@@ -19,8 +19,8 @@ export const entriesLabelsRoute = new Elysia({ prefix: "/entries/label" })
     },
     {
       query: v.object({
-        label_id: v.optional(idQuerySchema),
-        time_entry_id: v.optional(idQuerySchema),
+        label_id: v.optional(idListQuerySchema),
+        time_entry_id: v.optional(idListQuerySchema),
       }),
     },
   )
