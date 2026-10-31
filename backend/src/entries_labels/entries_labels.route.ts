@@ -1,13 +1,14 @@
 import Elysia from "elysia";
-import * as v from "valibot";
 import {
   createEntryLabel,
   deleteEntryLabel,
   getEntryLabels,
 } from "./entries_labels.repository";
 import { respondSuccess } from "../share/response";
-import { idListQuerySchema } from "../share/schema";
-import { EntryLabelLinkSchema } from "./entries_labels.schema";
+import {
+  EntryLabelLinkSchema,
+  QueryEntryLabelLinkSchema,
+} from "./entries_labels.schema";
 import { DescriptionDocs } from "../share/constants";
 
 export const entriesLabelsRoute = new Elysia({ prefix: "/entries/label" })
@@ -18,10 +19,7 @@ export const entriesLabelsRoute = new Elysia({ prefix: "/entries/label" })
       return respondSuccess(data, set.status);
     },
     {
-      query: v.object({
-        label_id: v.optional(idListQuerySchema),
-        time_entry_id: v.optional(idListQuerySchema),
-      }),
+      query: QueryEntryLabelLinkSchema,
     },
   )
   .post(
