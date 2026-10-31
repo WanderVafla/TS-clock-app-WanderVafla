@@ -1,21 +1,14 @@
+import { fetchResponse } from "#/action/fetchData.ts";
 import { ErrorMessage } from "#/contants/messages.ts";
-import type {
-  ApiSuccessResponse,
-  ApiSuccessError,
-} from "../../../backend/src/share/response.ts";
+import { API_URL } from "#/contants/url.ts";
 import type { EntriesFetch, EntriesSearch, Entry } from "./api.types.ts"
 
 
-
-export const fetchEntries = async ({ page, sizePage }: EntriesSearch): Promise<EntriesFetch> => {
-  const res = await fetch(`/api/entries?page=${page}&sizePage=${sizePage}`);
-  if (!res.ok) throw new Error("Connection Error");
-  const json: ApiSuccessResponse<Entry[]> | ApiSuccessError =
-    await res.json();
-  if (!json.success) throw new Error(json.message);
-  if (!json.metadata) {
+export const fetchEntries = async (deps: EntriesSearch): Promise<EntriesFetch> => {
+  const {data, metadata} = await fetchResponse<Entry[]>(API_URL.entries(deps));
+  if (!metadata) {
     // Metadata is required for entries and backend always return metadata for GET /entries
     throw new Error(ErrorMessage.NotFoundMetadata)
   }
-  return {data: json.data, metadata: json.metadata};
+  return {data, metadata};
 }
