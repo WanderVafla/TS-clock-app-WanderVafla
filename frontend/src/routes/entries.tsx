@@ -1,20 +1,22 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Pending } from "#/componets/Pending.tsx";
 import { ErrorDisplay } from "#/componets/ErrorDisplay.tsx";
 import { fetchEntries } from "#/api/api.entries.ts";
 import {
   EntriesSearchSchema,
   type Entry,
-  type EntryItem,
 } from "#/api/api.types.ts";
-import { fetchProjects } from "#/api/api.projects.ts";
-import { fetchEntriesLabels } from "#/api/api.entries_labels.ts";
-import { fetchLabels } from "#/api/api.labels.ts";
 import type { Metadata } from "../../../backend/src/share/schema.ts";
 import type { Label } from "../../../backend/src/labels/labels.schema.ts";
-import { PaginationConf, PendingConf } from "#/contants/config.ts";
+import { PendingConf } from "#/contants/config.ts";
+import { fetchData } from "#/action/fetchData.ts";
+import { API_URL } from "#/contants/url.ts";
+import type { EntryLabelLink } from "../../../backend/src/entries_labels/entries_labels.schema.ts";
+import type { Project } from "../../../backend/src/projects/projects.schema.ts";
+import { Pagination } from "#/componets/Pagination.tsx";
+import { Table, type TableColumn } from "#/componets/Table.tsx";
 import { Messages } from "#/contants/messages.ts";
-import { range } from "#/action/range.ts";
+import { EntryItemColumn } from "#/componets/columnItems/EntryItemColumn.tsx";
 
 type LoaderResponse = {
   data: (Entry & { project_name: string } & { labels: Label[] })[];
@@ -26,19 +28,20 @@ const loadData = async (deps: {
   sizePage: number;
 }): Promise<LoaderResponse> => {
   const [projects, entries, labels] = await Promise.all([
-    fetchProjects(),
+    fetchData<Project[]>(API_URL.project),
     fetchEntries(deps),
-    fetchLabels(),
+    fetchData<Label[]>(API_URL.labels),
   ]);
 
   const entriesLabels =
     entries.data.length > 0
-      ? await fetchEntriesLabels(entries.data.map((e) => e.id))
+      ? await fetchData<EntryLabelLink[]>(
+          API_URL.entries_labels(entries.data.map((e) => e.id)),
+        )
       : [];
 
   const data = entries.data.map((e) => {
-    const mathedProject = projects.data.find((p) => p.id === e.project_id);
-
+    const mathedProject = projects.find((p) => p.id === e.project_id);
     const methedEntriesLabels = entriesLabels.filter(
       (el) => el.time_entry_id === e.id,
     );
@@ -68,116 +71,79 @@ export const Route = createFileRoute("/entries")({
   pendingMs: PendingConf.pendingMs,
 });
 
+const DateFormated = new Intl.DateTimeFormat("fr-CH", {
+  dateStyle: "medium",
+  timeStyle: "short",
+});
+
 function RouteComponent() {
-  const { page, sizePage } = Route.useSearch();
+  const search = Route.useSearch();
   const { data, metadata }: LoaderResponse = Route.useLoaderData();
 
+  const columns: TableColumn[] = [
+    {
+      title: "Description",
+      width: 25,
+    },
+    {
+      title: "Project",
+      width: 10,
+    },
+    {
+      title: "Label",
+      width: 25,
+    },
+    {
+      title: "Start",
+      width: 15,
+    },
+    {
+      title: "End",
+      width: 15,
+    },
+    {
+      title: "Duration",
+      width: 10,
+    },
+  ];
+
+  const items = data.map((e) => {
+    const startDate = new Date(e.start_time);
+
+    const endDate = e.end_time
+      ? DateFormated.format(new Date(e.end_time))
+      : "Current";
+
+    return (
+      <EntryItemColumn
+        key={e.id}
+        description={e.description ?? "none"}
+        project_id={e.project_id}
+        project_name={e.project_name}
+        label={e.labels ?? "unknow"}
+        end_time={endDate}
+        start_time={DateFormated.format(startDate)}
+      />
+    );
+  });
+
   return (
-    <main className="p-20 h-dvh flex flex-col gap-10 items-center justify-between">
-      <table className="text-left w-full">
-        <thead>
-          <tr className="bg-gray-400">
-            <th className="min-w-3/10">Description</th>
-            <th className="min-w-1/10">Project</th>
-            <th className="min-w-1/10">Label</th>
-            <th className="min-w-2/10">Start Time</th>
-            <th className="min-w-2/10">End time</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((e) => {
-            const startDate = new Date(e.start_time);
+    <main className="p-4 md:p-10 h-dvh flex flex-col gap-10 items-center justify-between">
+      <div className="w-full h-full overflow-x-auto overscroll-none rounded-2xl shadow-2xl shadow-table-shadow">
+        <Table columns={columns} items={items} />
 
-            const DateFormated = new Intl.DateTimeFormat("fr-CH", {
-              dateStyle: "medium",
-              timeStyle: "short",
-            });
-
-            const endDate = e.end_time
-              ? DateFormated.format(new Date(e.end_time))
-              : "Current";
-
-            return (
-              <EntryItemComp
-                key={e.id}
-                description={e.description ?? "none"}
-                project_id={e.project_id}
-                project_name={e.project_name}
-                label={e.labels ?? "unknow"}
-                end_time={endDate}
-                start_time={DateFormated.format(startDate)}
-              />
-            );
-          })}
-        </tbody>
-      </table>
-
-      {/* placehoder if there is not entries */}
-      {data.length <= 0 ? <div>{Messages.notFound}</div> : ""}
-
-      {/* Pagination button */}
-      {metadata ? (
-        <div className="flex gap-3">
-          <Link
-            to="/entries"
-            search={{ page: page - 1, sizePage }}
-            disabled={page <= 1}
-          >
-            prev
-          </Link>
-          {range(
-            Math.max(1, page - PaginationConf.delataRange),
-            Math.min(metadata.totalPages, page + PaginationConf.delataRange),
-          ).map((p) => {
-            return (
-              <Link key={p} to="/entries" search={{ page: p, sizePage }}>
-                {p}
-              </Link>
-            );
-          })}
-
-          <Link
-            to="/entries"
-            search={{ page: page + 1, sizePage }}
-            disabled={page >= metadata.totalPages}
-          >
-            next
-          </Link>
-        </div>
-      ) : (
-        ""
-      )}
-    </main>
-  );
-}
-
-function EntryItemComp(entryProp: EntryItem) {
-  const { description, project_id, project_name, label, start_time, end_time } =
-    entryProp;
-  return (
-    <tr>
-      <td>{description}</td>
-      <td id={`${project_id}`}>{project_name}</td>
-
-      <td>
-        {label ? (
-          <div className="flex gap-1.5">
-            {label.map((l) => (
-              <div
-                className="p-1.5 flex bg-gray-300 rounded-2xl w-min overflow-hidden"
-                key={l.id}
-              >
-                {l.name}
-              </div>
-            ))}
+        {/*placehoder if there is not entries */}
+        {items.length <= 0 ? (
+          <div className="flex h-full items-center justify-center">
+            {Messages.notFound}
           </div>
         ) : (
           ""
         )}
-      </td>
+      </div>
 
-      <td>{start_time}</td>
-      <td>{end_time}</td>
-    </tr>
+      {/* Pagination button */}
+      {<Pagination metadata={metadata} search={search} />}
+    </main>
   );
 }
