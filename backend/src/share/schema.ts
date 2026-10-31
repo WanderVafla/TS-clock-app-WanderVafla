@@ -54,11 +54,11 @@ export const paginationParamsSchema = v.object({
 });
 
 const metadataSchema = v.object({
-  page: v.optional(idQuerySchema),
+  page: idQuerySchema,
   sizePage: v.optional(idQuerySchema),
   total: v.number(),
   totalPages: v.number(),
-  sorted: v.optional(stringSchema),
+  sorted: stringSchema,
 });
 
 export type Metadata = v.InferOutput<typeof metadataSchema>;

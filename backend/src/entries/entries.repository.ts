@@ -19,7 +19,7 @@ export const getEntries = async (
   const { id, project_id, page, sizePage, order } = params || {};
 
   const standartOrder = "start_time" as const;
-  const currentPage = sizePage !== undefined ? (page ?? 1) : undefined;
+  const currentPage = page ?? 1;
 
   return pg.begin("isolation level repeatable read", async (tx) => {
     const query: Entries[] = await tx`select * from ${tx(table_name)}
