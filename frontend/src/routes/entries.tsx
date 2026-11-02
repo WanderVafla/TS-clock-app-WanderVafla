@@ -113,8 +113,12 @@ function RouteComponent() {
   });
 
   return (
-    <main className="p-4 md:p-10 h-dvh flex flex-col gap-10 items-center justify-between">
-      <div className="w-full h-full overflow-x-auto overscroll-none rounded-2xl shadow-2xl shadow-table-shadow">
+    <main className="p-4 md:p-10 h-dvh flex flex-col gap-10 items-center">
+      <header className="self-start">
+        <h1 className="font-medium text-5xl tracking-widest">Planing</h1>
+      </header>
+
+      <section className="w-full h-full overflow-x-auto overscroll-none rounded-2xl shadow-2xl">
         <Table columns={columns} items={items} />
 
         {/*placehoder if there is not entries */}
@@ -125,10 +129,10 @@ function RouteComponent() {
         ) : (
           ""
         )}
-      </div>
+      </section>
 
       {/* Pagination button */}
-      {<Pagination metadata={metadata} search={search} />}
+      <nav>{<Pagination metadata={metadata} search={search} />}</nav>
     </main>
   );
 }
