@@ -59,7 +59,7 @@ export function Pagination({ metadata, search }: PaginationProp) {
       <Link
         to="/entries"
         search={{ page: totalPages, sizePage }}
-        disabled={page === totalPages}
+        disabled={page >= totalPages}
         aria-label="Last page"
         className="pagination-button"
       >
