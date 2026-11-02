@@ -4,7 +4,7 @@ import { NamesLength, ValidationError } from "../share/constants";
 
 const FieldColumnNames = ["name"] as const
 
-const ProjectSchema = v.object({
+export const ProjectSchema = v.object({
   id: idQuerySchema,
   name: v.pipe(
     stringSchema,

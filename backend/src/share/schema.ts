@@ -53,7 +53,7 @@ export const paginationParamsSchema = v.object({
   ),
 });
 
-const metadataSchema = v.object({
+export const metadataSchema = v.object({
   page: idQuerySchema,
   sizePage: v.optional(idQuerySchema),
   total: v.number(),
