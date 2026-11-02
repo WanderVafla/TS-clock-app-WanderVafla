@@ -2,24 +2,21 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Pending } from "#/componets/Pending.tsx";
 import { ErrorDisplay } from "#/componets/ErrorDisplay.tsx";
 import { fetchEntries } from "#/api/api.entries.ts";
-import {
-  EntriesSearchSchema,
-  type Entry,
-} from "#/api/api.types.ts";
+import { EntriesSearchSchema } from "#/api/api.types.ts";
 import type { Metadata } from "../../../backend/src/share/schema.ts";
 import type { Label } from "../../../backend/src/labels/labels.schema.ts";
 import { PendingConf } from "#/contants/config.ts";
-import { fetchData } from "#/action/fetchData.ts";
-import { API_URL } from "#/contants/url.ts";
-import type { EntryLabelLink } from "../../../backend/src/entries_labels/entries_labels.schema.ts";
-import type { Project } from "../../../backend/src/projects/projects.schema.ts";
 import { Pagination } from "#/componets/Pagination.tsx";
 import { Table, type TableColumn } from "#/componets/Table.tsx";
 import { Messages } from "#/contants/messages.ts";
 import { EntryItemColumn } from "#/componets/columnItems/EntryItemColumn.tsx";
+import { fetchProjects } from "#/api/api.projects.ts";
+import { fetchLabels } from "#/api/api.labels.ts";
+import type { Entries } from "../../../backend/src/entries/entries.schema.ts";
+import { fetchEntriesLabels } from "#/api/api.entriesLabels.ts";
 
 type LoaderResponse = {
-  data: (Entry & { project_name: string } & { labels: Label[] })[];
+  data: (Entries & { project_name: string } & { labels: Label[] })[];
   metadata: Metadata;
 };
 
@@ -28,16 +25,14 @@ const loadData = async (deps: {
   sizePage: number;
 }): Promise<LoaderResponse> => {
   const [projects, entries, labels] = await Promise.all([
-    fetchData<Project[]>(API_URL.project),
+    fetchProjects(),
     fetchEntries(deps),
-    fetchData<Label[]>(API_URL.labels),
+    fetchLabels(),
   ]);
 
   const entriesLabels =
     entries.data.length > 0
-      ? await fetchData<EntryLabelLink[]>(
-          API_URL.entries_labels(entries.data.map((e) => e.id)),
-        )
+      ? await fetchEntriesLabels(entries.data.map((e) => e.id))
       : [];
 
   const data = entries.data.map((e) => {
@@ -69,11 +64,6 @@ export const Route = createFileRoute("/entries")({
   errorComponent: ErrorDisplay,
   pendingMinMs: PendingConf.pendingMinMs,
   pendingMs: PendingConf.pendingMs,
-});
-
-const DateFormated = new Intl.DateTimeFormat("fr-CH", {
-  dateStyle: "medium",
-  timeStyle: "short",
 });
 
 function RouteComponent() {
@@ -108,21 +98,16 @@ function RouteComponent() {
   ];
 
   const items = data.map((e) => {
-    const startDate = new Date(e.start_time);
-
-    const endDate = e.end_time
-      ? DateFormated.format(new Date(e.end_time))
-      : "Current";
-
     return (
       <EntryItemColumn
         key={e.id}
-        description={e.description ?? "none"}
+        id={e.id}
+        description={e.description}
         project_id={e.project_id}
         project_name={e.project_name}
-        label={e.labels ?? "unknow"}
-        end_time={endDate}
-        start_time={DateFormated.format(startDate)}
+        labels={e.labels}
+        end_time={e.end_time}
+        start_time={e.start_time}
       />
     );
   });
