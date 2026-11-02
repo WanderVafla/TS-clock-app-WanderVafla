@@ -8,6 +8,14 @@ import { createEntryLabel } from "../entries_labels/entries_labels.repository";
 
 const table_name = DatabaseTableNames.entries;
 
+export const clockStatus = async (
+  sql: TransactionSQL | SQL = pg,
+): Promise<boolean> => {
+  const [{ exists }] =
+    await sql`select exists (select 1 from ${sql(table_name)} where end_time is null)`;
+  return exists;
+};
+
 export const clockIn = async (clockIn: ClockIn): Promise<Entries> => {
   const { label, ...fields } = clockIn;
   return pg.begin(async (tx) => {
