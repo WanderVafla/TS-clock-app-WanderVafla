@@ -1,9 +1,19 @@
 import Elysia from "elysia";
 import { respondSuccess } from "../share/response";
-import { clockChangeProject, clockIn, clockOut } from "./clock.repository";
+import {
+  clockChangeProject,
+  clockIn,
+  clockOut,
+  clockStatus,
+} from "./clock.repository";
 import { clockChangeSchema, clockInSchema } from "./clock.schema";
 
 export const clockRoute = new Elysia({ prefix: "/clock" })
+  .get("", async ({ set }) => {
+    const data = await clockStatus();
+    set.status = 200;
+    return respondSuccess(data, set.status);
+  })
   .post(
     "/in",
     async ({ body, set }) => {

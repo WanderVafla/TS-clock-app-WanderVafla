@@ -1,8 +1,30 @@
 
 @import "tailwindcss";
 
+/*
+ * App colors. Each one also becomes a Tailwind utility,
+ * e.g. --color-table-head -> bg-table-head, border-table-head.
+ */
+@theme {
+  --color-primery: var(--color-gray-400);
+
+  --color-hover: var(--color-blue-600);
+
+  --color-hover-sidebar: var(--color-hover);
+  --color-side-navigation: var(--color-primery);
+  --color-table-head: var(--color-primery);
+  --color-table-border: var(--color-gray-300);
+  --color-table-shadow: var(--color-gray-900);
+  --color-label: var(--color-gray-300);
+  --color-pagination-border: var(--color-primery);
+  --color-pagination-active: var(--color-primery);
+  --color-popover: var(--color-white);
+  --color-popover-shadow: rgb(0 0 0 / 0.25);
+}
+
 * {
   box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
 html,
@@ -15,3 +37,99 @@ body {
   margin: 0;
 }
 
+
+@layer components {
+  /* Cell spacing for data tables; change the variables to adjust it */
+  .data-table {
+    --cell-x: 0.5rem;
+    --cell-y: 0.5rem;
+    /* Vertical padding of the header cells, makes the header taller than body rows */
+    --head-y: 1rem;
+    --table-edge: 1.5rem;
+    /* Fits two rows of small labels or two lines of description */
+    --row-height: 4.75rem;
+    /* Below this width the table scrolls horizontally instead of squeezing */
+    --table-min-width: 56rem;
+
+    /* Column widths come from the header, not from the rows of the current page */
+    table-layout: fixed;
+    min-width: var(--table-min-width);
+  }
+
+  .data-table :is(th, td) {
+    padding: var(--cell-y) var(--cell-x);
+    text-align: left;
+  }
+
+  .data-table th {
+    padding-block: var(--head-y);
+  }
+
+  /* Same height for every body row, whatever the content of the page */
+  .data-table td {
+    height: var(--row-height);
+  }
+
+  /* Extra space between the outer columns and the table border */
+  .data-table tr > :first-child {
+    padding-left: var(--table-edge);
+  }
+
+  .data-table tr > :last-child {
+    padding-right: var(--table-edge);
+    text-align: right;
+  }
+
+  /*
+   * Description cell: the trigger and its popover share one anchor name,
+   * passed in through --description-anchor (unique for every row).
+   */
+  .description-trigger {
+    anchor-name: var(--description-anchor);
+    display: block;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .description-popover {
+    position-anchor: var(--description-anchor);
+    /* Reset the default popover placement (centered on the screen) */
+    inset: auto;
+    margin: 0.25rem 0 0;
+    /* Open under the description, starting at its left edge */
+    position-area: bottom span-right;
+    /* Open above it when there is no room below */
+    position-try-fallbacks: flip-block;
+
+    width: max-content;
+    max-width: min(28rem, 90vw);
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    background: var(--color-popover);
+    box-shadow: 0 10px 25px var(--color-popover-shadow);
+    overflow-wrap: break-word;
+  }
+
+  /* Pagination buttons; change --pagination-size to resize all of them */
+  .pagination {
+    --pagination-size: 2rem;
+  }
+
+  .pagination-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--pagination-size);
+    /* Square for short numbers, grows for long ones like 66995 */
+    min-width: var(--pagination-size);
+    padding-inline: 0.25rem;
+    border: 1px solid var(--color-pagination-border);
+    border-radius: 0.75rem;
+  }
+
+  .pagination-button[aria-disabled="true"] {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}

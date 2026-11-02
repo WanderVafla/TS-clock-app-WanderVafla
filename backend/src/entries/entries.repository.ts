@@ -1,8 +1,6 @@
-import {
-  InternalError,
-  NotFoundError,
-} from "../share/errors";
-import { DatabaseTableNames, pg } from "../share/constants";
+import { InternalError, NotFoundError } from "../share/errors";
+import { DatabaseTableNames } from "../share/constants";
+import { pg } from "../share/db";
 import type {
   CreateEntries,
   Entries,
@@ -15,14 +13,13 @@ import { createEntryLabel } from "../entries_labels/entries_labels.repository";
 /*  Table name from Database */
 const table_name = DatabaseTableNames.entries;
 
-
 export const getEntries = async (
   params?: QueryParamsGetEntries,
 ): Promise<[Entries[], Metadata]> => {
   const { id, project_id, page, sizePage, order } = params || {};
 
   const standartOrder = "start_time" as const;
-  const currentPage = sizePage !== undefined ? (page ?? 1) : undefined;
+  const currentPage = page ?? 1;
 
   return pg.begin("isolation level repeatable read", async (tx) => {
     const query: Entries[] = await tx`select * from ${tx(table_name)}
@@ -123,5 +120,3 @@ export const updateEntier = async (
 
   return query[0];
 };
-
-

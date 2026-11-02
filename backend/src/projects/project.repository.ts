@@ -1,6 +1,7 @@
 import type * as projectsType from "./projects.schema";
 import * as shareErrors from "../share/errors";
-import { DatabaseTableNames, pg } from "../share/constants";
+import { DatabaseTableNames } from "../share/constants";
+import { pg } from "../share/db";
 
 /* Table name from Database */
 const table_name = DatabaseTableNames.project;

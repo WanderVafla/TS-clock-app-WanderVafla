@@ -14,3 +14,4 @@ todos.json
 .opencode
 .zed
 backend/tests/contract
+.claude

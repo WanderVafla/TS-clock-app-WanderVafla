@@ -32,6 +32,7 @@ create table if not exists labels_time_entrie (
 
 -- Index --
 create index idx_time_entries_project_id on time_entries(project_id);
+create index idx_time_entries_start_time_id on time_entries (start_time, id);
 
 /* rules of protection */
 -- Needed for the exclusion constraint below

@@ -1,11 +1,20 @@
 import type { SQL, TransactionSQL } from "bun";
 import type { Entries } from "../entries/entries.schema";
-import { DatabaseTableNames, Lock_Keys, pg } from "../share/constants";
+import { DatabaseTableNames } from "../share/constants";
+import { Lock_Keys, pg } from "../share/db";
 import { NotFoundError } from "../share/errors";
 import type { ClockChange, ClockIn } from "./clock.schema";
 import { createEntryLabel } from "../entries_labels/entries_labels.repository";
 
 const table_name = DatabaseTableNames.entries;
+
+export const clockStatus = async (
+  sql: TransactionSQL | SQL = pg,
+): Promise<boolean> => {
+  const [{ exists }] =
+    await sql`select exists (select 1 from ${sql(table_name)} where end_time is null)`;
+  return exists;
+};
 
 export const clockIn = async (clockIn: ClockIn): Promise<Entries> => {
   const { label, ...fields } = clockIn;

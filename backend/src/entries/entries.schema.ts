@@ -28,7 +28,9 @@ export const EntriesBase = v.object({
     v.string(),
     v.isoTimestamp(ValidationError.DateNotCorrect),
   ),
-  end_time: v.pipe(v.string(), v.isoTimestamp(ValidationError.DateNotCorrect)),
+  end_time: v.nullish(
+    v.pipe(v.string(), v.isoTimestamp(ValidationError.DateNotCorrect)),
+  ),
   description: v.nullish(v.pipe(stringSchema)),
   project_id: idQuerySchema,
 });

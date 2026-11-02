@@ -25,6 +25,14 @@ export const idQuerySchema = v.pipe(
   ),
 );
 
+export const idListQuerySchema = v.pipe(
+  v.union([v.string(), v.array(v.string())]),
+  v.transform((val): (string | number)[] => (Array.isArray(val) ? val : [val])),
+  v.array(idQuerySchema),
+  v.minLength(1),
+  v.maxLength(MaxSizePage),
+);
+
 export const stringSchema = v.pipe(
   v.string(),
   v.trim(),
@@ -45,14 +53,12 @@ export const paginationParamsSchema = v.object({
   ),
 });
 
-const metadataSchema = v.optional(
-  v.object({
-    page: v.optional(idQuerySchema),
-    sizePage: v.optional(idQuerySchema),
-    total: v.optional(v.number()),
-    totalPages: v.optional(v.number()),
-    sorted: v.optional(stringSchema),
-  }),
-);
+export const metadataSchema = v.object({
+  page: idQuerySchema,
+  sizePage: v.optional(idQuerySchema),
+  total: v.number(),
+  totalPages: v.number(),
+  sorted: stringSchema,
+});
 
 export type Metadata = v.InferOutput<typeof metadataSchema>;
