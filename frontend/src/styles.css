@@ -6,12 +6,18 @@
  * e.g. --color-table-head -> bg-table-head, border-table-head.
  */
 @theme {
-  --color-table-head: var(--color-gray-400);
+  --color-primery: var(--color-gray-400);
+
+  --color-hover: var(--color-blue-600);
+
+  --color-hover-sidebar: var(--color-hover);
+  --color-side-navigation: var(--color-primery);
+  --color-table-head: var(--color-primery);
   --color-table-border: var(--color-gray-300);
   --color-table-shadow: var(--color-gray-900);
   --color-label: var(--color-gray-300);
-  --color-pagination-border: var(--color-gray-400);
-  --color-pagination-active: var(--color-gray-400);
+  --color-pagination-border: var(--color-primery);
+  --color-pagination-active: var(--color-primery);
   --color-popover: var(--color-white);
   --color-popover-shadow: rgb(0 0 0 / 0.25);
 }
