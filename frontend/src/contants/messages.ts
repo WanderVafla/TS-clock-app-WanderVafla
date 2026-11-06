@@ -3,5 +3,6 @@ export const Messages = {
 }
 
 export const ErrorMessage = {
-  NotFoundMetadata: "Not found metadata"
+  NotFoundMetadata: "Not found metadata",
+  NotFoundProject: "Not found project"
 }

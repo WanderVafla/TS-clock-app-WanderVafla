@@ -7,8 +7,7 @@ export const PaginationConf = {
   delataRange: 5
 }
 
-// Label count from which labels in a table cell get smaller
-export const LabelConf = {
-  mediumFrom: 4,
-  smallFrom: 7
+export const LabelListConf = {
+  // Labels shown in a table cell; the rest is folded into a "+N" chip
+  maxVisible: 3
 }

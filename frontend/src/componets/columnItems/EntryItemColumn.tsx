@@ -1,7 +1,9 @@
 import { dateFormat, formatDuration } from "#/action/dateFormat";
 import type { EntryItem } from "#/api/api.types";
 import { Description } from "../Description";
+import { Link } from "@tanstack/react-router";
 import { LabelList } from "../LabelList";
+import { EditIcon, OpenIcon } from "../icons/ActionIcons";
 
 type EntryItemColumnProps = EntryItem & {
   onEdit: () => void;
@@ -9,6 +11,7 @@ type EntryItemColumnProps = EntryItem & {
 
 export function EntryItemColumn({onEdit, ...entryProp}: EntryItemColumnProps ) {
   const {
+    id,
     description,
     project_id,
     project_name,
@@ -36,10 +39,27 @@ export function EntryItemColumn({onEdit, ...entryProp}: EntryItemColumnProps ) {
 
       <td>{startDate}</td>
       <td>{endDate}</td>
+      <td>{duration}</td>
       <td>
-        <button onClick={onEdit} type="button">
-          {duration}
-        </button>
+        <div className="flex justify-end gap-3 text-2xl [&>*:hover]:text-hover">
+          <Link
+            to="/entry/$entryId"
+            params={{ entryId: String(id) }}
+            title="Open entry"
+            aria-label="Open entry"
+          >
+            <OpenIcon />
+          </Link>
+          <button
+            className="cursor-pointer"
+            onClick={onEdit}
+            type="button"
+            title="Edit entry"
+            aria-label="Edit entry"
+          >
+            <EditIcon />
+          </button>
+        </div>
       </td>
     </tr>
   );

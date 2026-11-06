@@ -2,14 +2,14 @@ import { useActionState, useEffect, useRef } from "react";
 import * as v from "valibot";
 import { toDateTimeLocal } from "#/action/dateFormat.ts";
 import { createEntry, updateEntry } from "#/api/api.entries.ts";
-import type { Label } from "../../../../backend/src/labels/labels.schema.ts";
-import type { Project } from "../../../../backend/src/projects/projects.schema.ts";
+import type { Label } from "../../../backend/src/labels/labels.schema.ts";
+import type { Project } from "../../../backend/src/projects/projects.schema.ts";
 import {
   CreateEntriesSchema,
   UpdateEntriesSchema,
   type CreateEntries,
   type UpdateEntier,
-} from "../../../../backend/src/entries/entries.schema.ts";
+} from "../../../backend/src/entries/entries.schema.ts";
 import type { EntryItem } from "#/api/api.types.ts";
 import { useRouter } from "@tanstack/react-router";
 
@@ -140,9 +140,7 @@ export function CreateEditEntryForm({
         {state.error}
       </div>
 
-      <h1 className="font-medium text-3xl tracking-widest">
-        {entryItem?.id ? "Edit Entry" : "Create Entry"}
-      </h1>
+      <h1>{entryItem?.id ? "Edit Entry" : "Create Entry"}</h1>
 
       <form action={formAction} className="flex flex-col gap-5">
         <input name="id" type="hidden" value={entryItem?.id} />
