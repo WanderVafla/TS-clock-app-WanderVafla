@@ -76,7 +76,7 @@ const loadData = async (id: number): Promise<LoaderResponse> => {
 
   const entryData = entry.data[0];
 
-  if (!entry) {
+  if (!entryData) {
     throw notFound();
   }
 
