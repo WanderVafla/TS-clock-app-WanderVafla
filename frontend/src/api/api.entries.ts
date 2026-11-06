@@ -2,10 +2,11 @@ import { fetchData, fetchResponse } from "#/action/fetchData.ts";
 import { ErrorMessage } from "#/contants/messages.ts";
 import { API_URL } from "#/contants/url.ts";
 import { EntriesSchema, type CreateEntries, type Entries, type UpdateEntier } from "../../../backend/src/entries/entries.schema";
-import type { EntriesFetch, EntriesSearch } from "./api.types";
+import type { EntriesFetch } from "./api.types";
+import type { QueryParamsGetEntries } from "../../../backend/src/entries/entries.schema.ts";
 import * as v from "valibot"
 
-export const fetchEntries = async (deps: EntriesSearch): Promise<EntriesFetch> => {
+export const fetchEntries = async (deps: QueryParamsGetEntries): Promise<EntriesFetch> => {
   const {data, metadata} = await fetchResponse(API_URL.entries(deps), v.array(EntriesSchema));
   if (!metadata) {
     // Metadata is required for entries and backend always return metadata for GET /entries
