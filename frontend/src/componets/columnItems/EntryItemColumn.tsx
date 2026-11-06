@@ -3,7 +3,11 @@ import type { EntryItem } from "#/api/api.types";
 import { Description } from "../Description";
 import { LabelList } from "../LabelList";
 
-export function EntryItemColumn(entryProp: EntryItem) {
+type EntryItemColumnProps = EntryItem & {
+  onEdit: () => void;
+};
+
+export function EntryItemColumn({onEdit, ...entryProp}: EntryItemColumnProps ) {
   const {
     description,
     project_id,
@@ -32,7 +36,11 @@ export function EntryItemColumn(entryProp: EntryItem) {
 
       <td>{startDate}</td>
       <td>{endDate}</td>
-      <td>{duration}</td>
+      <td>
+        <button onClick={onEdit} type="button">
+          {duration}
+        </button>
+      </td>
     </tr>
   );
 }
