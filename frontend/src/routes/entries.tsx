@@ -15,11 +15,8 @@ import { fetchLabels } from "#/api/api.labels.ts";
 import type { Entries } from "../../../backend/src/entries/entries.schema.ts";
 import { fetchEntriesLabels } from "#/api/api.entriesLabels.ts";
 import type { Project } from "../../../backend/src/projects/projects.schema.ts";
-import {
-  CreateEditEntryForm,
-  openModal,
-} from "#/componets/columnItems/CreateEditEntryForm.tsx";
-import { useRef, useState } from "react";
+import { CreateEditEntryForm } from "#/componets/columnItems/CreateEditEntryForm.tsx";
+import { useState } from "react";
 
 type LoaderResponse = {
   data: (Entries & { project_name: string } & { labels: Label[] })[];
@@ -81,10 +78,11 @@ function RouteComponent() {
   const { data, metadata, projects, labels }: LoaderResponse =
     Route.useLoaderData();
 
-  const modalRef = useRef<HTMLDialogElement | null>(null);
-  const [editing, setEditing] = useState<EntryItem | null>(null)
+  // undefined = dialog closed, null = creating a new entry, EntryItem = editing that entry
+  const [dialogEntry, setDialogEntry] = useState<EntryItem | null | undefined>(
+    undefined,
+  );
 
-  
   const columns: TableColumn[] = [
     {
       title: "Description",
@@ -123,7 +121,7 @@ function RouteComponent() {
         labels={e.labels}
         end_time={e.end_time}
         start_time={e.start_time}
-        onEdit={() => openModal(modalRef, setEditing, e)}
+        onEdit={() => setDialogEntry(e)}
       />
     );
   });
@@ -136,13 +134,21 @@ function RouteComponent() {
 
       <button
         className="p-3 bg-button rounded-2xl self-end cursor-pointer"
-        onClick={() => openModal(modalRef, setEditing, null)}
+        onClick={() => setDialogEntry(null)}
         type="button"
       >
         Add Entry
       </button>
 
-      <CreateEditEntryForm ref={modalRef} projects={projects} labels={labels} entryItem={editing} />
+      {/* Rendered only while open, so every opening starts with a fresh form and no stale error */}
+      {dialogEntry !== undefined && (
+        <CreateEditEntryForm
+          projects={projects}
+          labels={labels}
+          entryItem={dialogEntry}
+          onClose={() => setDialogEntry(undefined)}
+        />
+      )}
 
       <section className="flex flex-col w-full h-full overflow-x-auto overscroll-none rounded-2xl shadow-2xl">
         <Table columns={columns} items={items} />

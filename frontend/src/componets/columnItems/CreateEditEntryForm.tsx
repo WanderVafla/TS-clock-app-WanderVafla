@@ -1,4 +1,4 @@
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import * as v from "valibot";
 import { toDateTimeLocal } from "#/action/dateFormat.ts";
 import { createEntry, updateEntry } from "#/api/api.entries.ts";
@@ -12,23 +12,6 @@ import {
 } from "../../../../backend/src/entries/entries.schema.ts";
 import type { EntryItem } from "#/api/api.types.ts";
 import { useRouter } from "@tanstack/react-router";
-
-export const openModal = (
-  ref: React.RefObject<HTMLDialogElement | null>,
-  editState: React.Dispatch<EntryItem | null>,
-  item: EntryItem | null,
-) => {
-  if (ref.current !== null) {
-    editState(item);
-    ref.current.showModal();
-  }
-};
-
-export const closeModal = (ref: React.RefObject<HTMLDialogElement | null>) => {
-  if (ref.current !== null) {
-    ref.current.close();
-  }
-};
 
 type CreateEntryState = {
   error: string | null;
@@ -105,21 +88,31 @@ async function saveEntryAction(
 export function CreateEditEntryForm({
   projects,
   labels,
-  ref,
   entryItem,
+  onClose,
 }: {
   projects: Project[];
   labels: Label[];
-  ref: React.RefObject<HTMLDialogElement | null>;
   entryItem: EntryItem | null;
+  onClose: () => void;
 }) {
   const router = useRouter();
+  const dialogRef = useRef<HTMLDialogElement | null>(null);
+
+  // Open as modal once the <dialog> is in the DOM; the guard avoids a second showModal() under StrictMode
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (dialog && !dialog.open) {
+      dialog.showModal();
+    }
+  }, []);
+
   const [state, formAction, isPending] = useActionState(
     (prev: CreateEntryState, formData: FormData) =>
       saveEntryAction(
         async () => {
           await router.invalidate();
-          closeModal(ref);
+          onClose();
         },
         entryItem,
         prev,
@@ -136,7 +129,9 @@ export function CreateEditEntryForm({
   return (
     <dialog
       className="md:w-1/3 p-5 gap-10 flex flex-col justify-self-center self-center rounded-2xl"
-      ref={ref}
+      ref={dialogRef}
+      // Fires for Esc too, so the parent unmounts the dialog however it was closed
+      onClose={onClose}
     >
       <div
         className="flex flex-wrap text-red-600 justify-center tracking-wide"
@@ -149,11 +144,7 @@ export function CreateEditEntryForm({
         {entryItem?.id ? "Edit Entry" : "Create Entry"}
       </h1>
 
-      <form
-        key={entryItem?.id ?? "new"}
-        action={formAction}
-        className="flex flex-col gap-5"
-      >
+      <form action={formAction} className="flex flex-col gap-5">
         <input name="id" type="hidden" value={entryItem?.id} />
         <textarea
           className="input-form h-30 resize-none"
@@ -236,7 +227,7 @@ export function CreateEditEntryForm({
           <button
             className="bg-primery p-2 rounded-3xl"
             type="button"
-            onClick={() => closeModal(ref)}
+            onClick={onClose}
           >
             Cancel
           </button>
