@@ -59,19 +59,22 @@ export const createEntry = async (entry: CreateEntries): Promise<Entries> => {
   const { label, ...CreateEntries } = entry;
   return pg.begin(async (tx) => {
     const query: Entries[] =
-      await tx`insert into ${tx(table_name)} ${tx(CreateEntries)} RETURNING *;`;
+      await tx`insert into ${tx(table_name)} ${tx(CreateEntries)} returning *;`;
 
     if (query.length === 0) {
       throw new InternalError();
     }
 
     if (label) {
-      await createEntryLabel(
-        {
-          time_entry_id: query[0].id,
-          label_id: label,
-        },
-        tx,
+      label.map(
+        async (l) =>
+          await createEntryLabel(
+            {
+              time_entry_id: query[0].id,
+              label_id: l,
+            },
+            tx,
+          ),
       );
     }
 

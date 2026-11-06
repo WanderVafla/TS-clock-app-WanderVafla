@@ -35,7 +35,7 @@ export const EntriesBase = v.object({
   project_id: idQuerySchema,
 });
 
-export const labelIdSchema = idQuerySchema;
+export const labelIdSchema = v.array(idQuerySchema);
 
 export const EntriesSchema = v.pipe(
   EntriesBase,

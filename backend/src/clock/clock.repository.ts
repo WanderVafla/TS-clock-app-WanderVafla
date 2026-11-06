@@ -24,13 +24,15 @@ export const clockIn = async (clockIn: ClockIn): Promise<Entries> => {
       await tx`insert into ${tx(table_name)} ${tx(fields)} returning *;`;
 
     if (label) {
-      await createEntryLabel(
-        {
-          time_entry_id: query.id,
-          label_id: label,
-        },
-        tx,
-      );
+      label.map(async (l) => {
+        await createEntryLabel(
+          {
+            time_entry_id: query.id,
+            label_id: l,
+          },
+          tx,
+        );
+      });
     }
     return query;
   });
@@ -69,13 +71,15 @@ export const clockChangeProject = async (
     })} returning *;`;
 
     if (label) {
-      await createEntryLabel(
-        {
-          time_entry_id: opened.id,
-          label_id: label,
-        },
-        tx,
-      );
+      label.map(async (l) => {
+        await createEntryLabel(
+          {
+            time_entry_id: opened.id,
+            label_id: l,
+          },
+          tx,
+        );
+      });
     } else {
       /* Copy labels of closed clock to opened clock */
       await tx`insert into ${tx(DatabaseTableNames.entries_labels)} (time_entry_id, label_id)
