@@ -122,7 +122,7 @@ export const updateEntier = async (
         where id = ${id}
         returning *;
       `
-        : await tx`select * from ${tx(table_name)} where id = ${id};`;
+        : await tx`select * from ${tx(table_name)} where id = ${id} for update;`;
 
     if (!entry) {
       throw new NotFoundError();
