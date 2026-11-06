@@ -15,12 +15,13 @@ const UpdateDataColumns = [
   ...FieldColumnNames,
   "end_time",
   "start_time",
+  "project_id",
 ] as const;
 
 const isEndNotBeforeStart = ({ start_time, end_time }: TimeRange) =>
   start_time == null ||
   end_time == null ||
-  new Date(end_time) >= new Date(start_time);
+  new Date(end_time) > new Date(start_time);
 
 export const EntriesBase = v.object({
   id: idQuerySchema,
@@ -35,7 +36,7 @@ export const EntriesBase = v.object({
   project_id: idQuerySchema,
 });
 
-export const labelIdSchema = idQuerySchema;
+export const labelIdSchema = v.array(idQuerySchema);
 
 export const EntriesSchema = v.pipe(
   EntriesBase,
@@ -45,7 +46,7 @@ export const EntriesSchema = v.pipe(
       ({ start_time, end_time }) =>
         start_time == null ||
         end_time == null ||
-        new Date(end_time) >= new Date(start_time),
+        new Date(end_time) > new Date(start_time),
       ValidationError.ValueIsLessThatValue("end_time", "start_time", "less"),
     ),
     ["end_time"],
@@ -64,12 +65,21 @@ export const CreateEntriesSchema = v.pipe(
     (i) => i.end_time != null || new Date(i.start_time) <= new Date(),
     ValidationError.StartTimeInFuture,
   ),
+  v.forward(
+    v.partialCheck(
+      [["start_time"], ["end_time"]],
+      isEndNotBeforeStart,
+      ValidationError.ValueIsLessThatValue("end_time", "start_time", "less"),
+    ),
+    ["end_time"],
+  ),
 );
 
 export const UpdateEntriesSchema = v.pipe(
   v.object({
     id: EntriesBase.entries.id,
     ...v.partial(v.pick(EntriesBase, UpdateDataColumns)).entries,
+    label: v.optional(labelIdSchema),
   }),
   v.check(
     (i) => Object.keys(i).some((k) => k !== "id"),

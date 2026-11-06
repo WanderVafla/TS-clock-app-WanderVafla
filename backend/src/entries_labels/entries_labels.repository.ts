@@ -1,5 +1,8 @@
 import type { SQL, TransactionSQL } from "bun";
-import type { EntryLabelLink } from "./entries_labels.schema";
+import type {
+  CreateEditEntryLabelLink,
+  EntryLabelLink,
+} from "./entries_labels.schema";
 import { DatabaseTableNames } from "../share/constants";
 import { pg } from "../share/db";
 import { AlreadyExistsError, NotFoundError } from "../share/errors";
@@ -34,6 +37,40 @@ export const createEntryLabel = async (
   }
 
   return query[0];
+};
+
+// main logic of update entries_labels on one entry
+const updateEntryLabelInTx = async (
+  link: CreateEditEntryLabelLink,
+  sql: TransactionSQL | SQL,
+): Promise<EntryLabelLink[]> => {
+  const { time_entry_id, label_id } = link;
+  // Renamed because there is a conflict with column name into DB
+  const labels_ids = label_id;
+  await sql`delete from ${sql(table_name)}
+    where time_entry_id = ${time_entry_id}`;
+
+  if (labels_ids.length === 0) return [];
+
+  const rows = labels_ids.map((label_id) => ({ time_entry_id, label_id }));
+
+  const inserted: EntryLabelLink[] = await sql`
+    insert into ${sql(table_name)} ${sql(rows)}
+    returning *`;
+
+  return inserted;
+};
+
+export const updateEntryLabel = async (
+  link: CreateEditEntryLabelLink,
+  sql?: TransactionSQL,
+): Promise<EntryLabelLink[]> => {
+  if (!sql) {
+    return await pg.begin(async (tx) => {
+      return updateEntryLabelInTx(link, tx);
+    });
+  }
+  return updateEntryLabelInTx(link, sql);
 };
 
 export const deleteEntryLabel = async (

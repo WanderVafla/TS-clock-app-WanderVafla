@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Pending } from "#/componets/Pending.tsx";
 import { ErrorDisplay } from "#/componets/ErrorDisplay.tsx";
 import { fetchEntries } from "#/api/api.entries.ts";
-import { EntriesSearchSchema } from "#/api/api.types.ts";
+import { EntriesSearchSchema, type EntryItem } from "#/api/api.types.ts";
 import type { Metadata } from "../../../backend/src/share/schema.ts";
 import type { Label } from "../../../backend/src/labels/labels.schema.ts";
 import { PendingConf } from "#/contants/config.ts";
@@ -14,10 +14,15 @@ import { fetchProjects } from "#/api/api.projects.ts";
 import { fetchLabels } from "#/api/api.labels.ts";
 import type { Entries } from "../../../backend/src/entries/entries.schema.ts";
 import { fetchEntriesLabels } from "#/api/api.entriesLabels.ts";
+import type { Project } from "../../../backend/src/projects/projects.schema.ts";
+import { CreateEditEntryForm } from "#/componets/columnItems/CreateEditEntryForm.tsx";
+import { useState } from "react";
 
 type LoaderResponse = {
   data: (Entries & { project_name: string } & { labels: Label[] })[];
   metadata: Metadata;
+  projects: Project[];
+  labels: Label[];
 };
 
 const loadData = async (deps: {
@@ -52,6 +57,8 @@ const loadData = async (deps: {
   return {
     ...entries,
     data: data,
+    projects,
+    labels,
   };
 };
 
@@ -68,7 +75,13 @@ export const Route = createFileRoute("/entries")({
 
 function RouteComponent() {
   const search = Route.useSearch();
-  const { data, metadata }: LoaderResponse = Route.useLoaderData();
+  const { data, metadata, projects, labels }: LoaderResponse =
+    Route.useLoaderData();
+
+  // undefined = dialog closed, null = creating a new entry, EntryItem = editing that entry
+  const [dialogEntry, setDialogEntry] = useState<EntryItem | null | undefined>(
+    undefined,
+  );
 
   const columns: TableColumn[] = [
     {
@@ -108,6 +121,7 @@ function RouteComponent() {
         labels={e.labels}
         end_time={e.end_time}
         start_time={e.start_time}
+        onEdit={() => setDialogEntry(e)}
       />
     );
   });
@@ -118,7 +132,25 @@ function RouteComponent() {
         <h1 className="font-medium text-5xl tracking-widest">Planing</h1>
       </header>
 
-      <section className="w-full h-full overflow-x-auto overscroll-none rounded-2xl shadow-2xl">
+      <button
+        className="p-3 bg-button rounded-2xl self-end cursor-pointer"
+        onClick={() => setDialogEntry(null)}
+        type="button"
+      >
+        Add Entry
+      </button>
+
+      {/* Rendered only while open, so every opening starts with a fresh form and no stale error */}
+      {dialogEntry !== undefined && (
+        <CreateEditEntryForm
+          projects={projects}
+          labels={labels}
+          entryItem={dialogEntry}
+          onClose={() => setDialogEntry(undefined)}
+        />
+      )}
+
+      <section className="flex flex-col w-full h-full overflow-x-auto overscroll-none rounded-2xl shadow-2xl">
         <Table columns={columns} items={items} />
 
         {/*placehoder if there is not entries */}
