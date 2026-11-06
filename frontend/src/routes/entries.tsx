@@ -86,27 +86,31 @@ function RouteComponent() {
   const columns: TableColumn[] = [
     {
       title: "Description",
-      width: 25,
+      width: 21,
     },
     {
       title: "Project",
-      width: 10,
+      width: 9,
     },
     {
       title: "Label",
-      width: 25,
+      width: 26,
     },
     {
       title: "Start",
-      width: 15,
+      width: 13,
     },
     {
       title: "End",
-      width: 15,
+      width: 13,
     },
     {
       title: "Duration",
-      width: 10,
+      width: 9,
+    },
+    {
+      title: "Actions",
+      width: 9,
     },
   ];
 
