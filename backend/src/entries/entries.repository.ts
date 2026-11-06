@@ -69,15 +69,16 @@ export const createEntry = async (entry: CreateEntries): Promise<Entries> => {
     }
 
     if (label) {
-      label.map(
-        async (l) =>
-          await createEntryLabel(
+      await Promise.all(
+        label.map((l) =>
+          createEntryLabel(
             {
               time_entry_id: query[0].id,
               label_id: l,
             },
             tx,
           ),
+        ),
       );
     }
 
