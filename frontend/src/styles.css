@@ -10,6 +10,7 @@
 
   --color-hover: var(--color-blue-600);
 
+  --color-border: var(--color-primery);
   --color-button: var(--color-primery);
   --color-hover-sidebar: var(--color-hover);
   --color-side-navigation: var(--color-primery);
@@ -40,6 +41,17 @@ body {
 
 dialog:not([open]) {
     display: none;
+}
+
+@layer base {
+  /* Base heading style; a text-* class on an h1 still overrides the size */
+  h1 {
+    @apply font-medium text-4xl tracking-widest;
+  }
+
+  h2 {
+    @apply font-medium text-3xl tracking-widest;
+  }
 }
 
 @layer components {

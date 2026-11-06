@@ -140,9 +140,7 @@ export function CreateEditEntryForm({
         {state.error}
       </div>
 
-      <h1 className="font-medium text-3xl tracking-widest">
-        {entryItem?.id ? "Edit Entry" : "Create Entry"}
-      </h1>
+      <h1>{entryItem?.id ? "Edit Entry" : "Create Entry"}</h1>
 
       <form action={formAction} className="flex flex-col gap-5">
         <input name="id" type="hidden" value={entryItem?.id} />
