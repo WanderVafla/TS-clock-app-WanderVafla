@@ -114,12 +114,19 @@ export const updateEntier = async (
 ): Promise<UpdateEntier> => {
   const { id, label, ...updateEntier } = entier;
   return pg.begin(async (tx) => {
-    const query: UpdateEntier[] = await pg`
-      update ${pg(table_name)}
-      set ${pg(updateEntier)}
-      where id = ${id}
-      returning *;
-    `;
+    const [entry]: UpdateEntier[] =
+      Object.keys(updateEntier).length > 0
+        ? await tx`
+        update ${tx(table_name)}
+        set ${tx(updateEntier)}
+        where id = ${id}
+        returning *;
+      `
+        : await tx`select * from ${tx(table_name)} where id = ${id};`;
+
+    if (!entry) {
+      throw new NotFoundError();
+    }
 
     if (label) {
       await updateEntryLabel(
@@ -131,10 +138,6 @@ export const updateEntier = async (
       );
     }
 
-    if (query.length === 0) {
-      throw new NotFoundError();
-    }
-
-    return query[0];
+    return entry;
   });
 };
