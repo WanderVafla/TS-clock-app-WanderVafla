@@ -80,14 +80,14 @@ never overlap. A running timer is an entry with `end_time: null`.
 one at the same moment, so time already tracked keeps its project and labels:
 
 - a field that is not sent is copied from the closed entry;
-- `label` replaces the labels; without `label` the labels of the closed entry
-  are copied.
+- `label` is an array of label ids and replaces the labels; `[]` clears them;
+  without `label` the labels of the closed entry are copied.
 
 ```bash
 curl -X POST http://localhost:8000/clock/in -H 'Content-Type: application/json' \
-  -d '{"project_id": 2, "label": 2}'
+  -d '{"project_id": 2, "label": [2]}'
 curl -X POST http://localhost:8000/clock/change -H 'Content-Type: application/json' \
-  -d '{"label": 3}'
+  -d '{"label": [3]}'
 curl -X POST http://localhost:8000/clock/out
 ```
 
