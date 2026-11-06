@@ -14,7 +14,7 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <div className="flex">
+    <div className="flex flex-col w-dvw h-dvh md:flex-row">
       <SideNavigation />
       <Outlet />
       <TanStackDevtools
