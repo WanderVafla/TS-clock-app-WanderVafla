@@ -2,14 +2,14 @@ import { useActionState, useEffect, useRef } from "react";
 import * as v from "valibot";
 import { toDateTimeLocal } from "#/action/dateFormat.ts";
 import { createEntry, updateEntry } from "#/api/api.entries.ts";
-import type { Label } from "../../../../backend/src/labels/labels.schema.ts";
-import type { Project } from "../../../../backend/src/projects/projects.schema.ts";
+import type { Label } from "../../../backend/src/labels/labels.schema.ts";
+import type { Project } from "../../../backend/src/projects/projects.schema.ts";
 import {
   CreateEntriesSchema,
   UpdateEntriesSchema,
   type CreateEntries,
   type UpdateEntier,
-} from "../../../../backend/src/entries/entries.schema.ts";
+} from "../../../backend/src/entries/entries.schema.ts";
 import type { EntryItem } from "#/api/api.types.ts";
 import { useRouter } from "@tanstack/react-router";
 

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Pending } from "#/componets/Pending.tsx";
-import { ErrorDisplay } from "#/componets/ErrorDisplay.tsx";
+import { Pending } from "#/componets/placeholders/Pending.tsx";
+import { ErrorDisplay } from "#/componets/placeholders/ErrorDisplay.tsx";
 import { fetchEntries } from "#/api/api.entries.ts";
 import { EntriesSearchSchema, type EntryItem } from "#/api/api.types.ts";
 import type { Metadata } from "../../../backend/src/share/schema.ts";
@@ -15,7 +15,7 @@ import { fetchLabels } from "#/api/api.labels.ts";
 import type { Entries } from "../../../backend/src/entries/entries.schema.ts";
 import { fetchEntriesLabels } from "#/api/api.entriesLabels.ts";
 import type { Project } from "../../../backend/src/projects/projects.schema.ts";
-import { CreateEditEntryForm } from "#/componets/columnItems/CreateEditEntryForm.tsx";
+import { CreateEditEntryForm } from "#/componets/CreateEditEntryForm.tsx";
 import { useState } from "react";
 
 type LoaderResponse = {
