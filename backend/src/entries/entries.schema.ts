@@ -20,7 +20,7 @@ const UpdateDataColumns = [
 const isEndNotBeforeStart = ({ start_time, end_time }: TimeRange) =>
   start_time == null ||
   end_time == null ||
-  new Date(end_time) >= new Date(start_time);
+  new Date(end_time) > new Date(start_time);
 
 export const EntriesBase = v.object({
   id: idQuerySchema,
@@ -45,7 +45,7 @@ export const EntriesSchema = v.pipe(
       ({ start_time, end_time }) =>
         start_time == null ||
         end_time == null ||
-        new Date(end_time) >= new Date(start_time),
+        new Date(end_time) > new Date(start_time),
       ValidationError.ValueIsLessThatValue("end_time", "start_time", "less"),
     ),
     ["end_time"],
@@ -63,6 +63,14 @@ export const CreateEntriesSchema = v.pipe(
   v.check(
     (i) => i.end_time != null || new Date(i.start_time) <= new Date(),
     ValidationError.StartTimeInFuture,
+  ),
+  v.forward(
+    v.partialCheck(
+      [["start_time"], ["end_time"]],
+      isEndNotBeforeStart,
+      ValidationError.ValueIsLessThatValue("end_time", "start_time", "less"),
+    ),
+    ["end_time"],
   ),
 );
 
