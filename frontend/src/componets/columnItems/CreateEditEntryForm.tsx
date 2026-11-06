@@ -34,8 +34,22 @@ type CreateEntryState = {
   error: string | null;
 };
 
+const changedTime = (
+  input: string,
+  original: string | undefined | null,
+): string | null | undefined => {
+  const originalInput = original ? toDateTimeLocal(original) : "";
+  const unchanged =
+    input && originalInput
+      ? new Date(input).getTime() === new Date(originalInput).getTime()
+      : input === originalInput;
+  if (unchanged) return undefined;
+  return input ? new Date(input).toISOString() : null;
+};
+
 async function saveEntryAction(
   onSuccess: () => Promise<void>,
+  entryItem: EntryItem | null,
   _prev: CreateEntryState,
   formData: FormData,
 ) {
@@ -43,7 +57,6 @@ async function saveEntryAction(
     const id: number | null = Number(String(formData.get("id")).trim());
     const start_time = String(formData.get("start_time"));
     const end_time = String(formData.get("end_time"));
-    console.log(end_time.trim() ? end_time : null);
     const description = String(formData.get("description"));
     const labels = formData.getAll("labels").map(Number);
 
@@ -53,6 +66,7 @@ async function saveEntryAction(
       : null;
 
     const project_id = Number(formData.get("project_id"));
+
     const item: CreateEntries | UpdateEntier = {
       id,
       project_id,
@@ -61,9 +75,22 @@ async function saveEntryAction(
       description,
       label: labels,
     };
+
     if (id) {
-      await updateEntry(v.parse(UpdateEntriesSchema, item));
-      await onSuccess();
+      if (entryItem) {
+        const Editeditem: CreateEntries | UpdateEntier = {
+          id,
+          project_id,
+          start_time:
+            changedTime(start_time, entryItem?.start_time) ??
+            entryItem.start_time,
+          end_time: changedTime(end_time, entryItem?.end_time),
+          description: description.trim() === "" ? null : description,
+          label: labels,
+        };
+        await updateEntry(v.parse(UpdateEntriesSchema, Editeditem));
+        await onSuccess();
+      }
     } else {
       await createEntry(v.parse(CreateEntriesSchema, item));
       await onSuccess();
@@ -94,6 +121,7 @@ export function CreateEditEntryForm({
           await router.invalidate();
           closeModal(ref);
         },
+        entryItem,
         prev,
         formData,
       ),
@@ -162,6 +190,7 @@ export function CreateEditEntryForm({
               Start
             </label>
             <input
+              step={1}
               className="input-form"
               type="datetime-local"
               name="start_time"
@@ -175,6 +204,7 @@ export function CreateEditEntryForm({
           <div className="flex gap-2">
             <label htmlFor="start-time">End</label>
             <input
+              step={1}
               className="input-form"
               type="datetime-local"
               defaultValue={
