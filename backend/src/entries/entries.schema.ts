@@ -15,6 +15,7 @@ const UpdateDataColumns = [
   ...FieldColumnNames,
   "end_time",
   "start_time",
+  "project_id",
 ] as const;
 
 const isEndNotBeforeStart = ({ start_time, end_time }: TimeRange) =>
@@ -78,6 +79,7 @@ export const UpdateEntriesSchema = v.pipe(
   v.object({
     id: EntriesBase.entries.id,
     ...v.partial(v.pick(EntriesBase, UpdateDataColumns)).entries,
+    label: v.optional(labelIdSchema),
   }),
   v.check(
     (i) => Object.keys(i).some((k) => k !== "id"),

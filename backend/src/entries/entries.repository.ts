@@ -8,7 +8,10 @@ import type {
   UpdateEntier,
 } from "./entries.schema";
 import type { Metadata } from "../share/schema";
-import { createEntryLabel } from "../entries_labels/entries_labels.repository";
+import {
+  createEntryLabel,
+  updateEntryLabel,
+} from "../entries_labels/entries_labels.repository";
 
 /*  Table name from Database */
 const table_name = DatabaseTableNames.entries;
@@ -108,18 +111,29 @@ export const deleteEntier = async (id: number): Promise<{ id: number }> => {
 export const updateEntier = async (
   entier: UpdateEntier,
 ): Promise<UpdateEntier> => {
-  const { id, ...updateEntier } = entier;
-
-  const query: UpdateEntier[] = await pg`
+  const { id, label, ...updateEntier } = entier;
+  return pg.begin(async (tx) => {
+    const query: UpdateEntier[] = await pg`
       update ${pg(table_name)}
       set ${pg(updateEntier)}
       where id = ${id}
       returning *;
     `;
 
-  if (query.length === 0) {
-    throw new NotFoundError();
-  }
+    if (label) {
+      await updateEntryLabel(
+        {
+          time_entry_id: id,
+          label_id: label,
+        },
+        tx,
+      );
+    }
 
-  return query[0];
+    if (query.length === 0) {
+      throw new NotFoundError();
+    }
+
+    return query[0];
+  });
 };
