@@ -14,8 +14,8 @@ const ApiSuccessResponseSchema = <S extends v.GenericSchema>(schema: S) => v.obj
 type ApiSuccessResponseOutput<S extends v.GenericSchema> =
   v.InferOutput<ReturnType<typeof ApiSuccessResponseSchema<S>>>;
 
-export const fetchData = async <S extends v.GenericSchema>(URL: string, schema: S): Promise<v.InferOutput<S>> => {
-  const res = await fetch(URL);
+export const fetchData = async <S extends v.GenericSchema>(URL: string, schema: S, init?: RequestInit): Promise<v.InferOutput<S>> => {
+  const res = await fetch(URL, init);
   const json: ApiSuccessResponse<unknown> | ApiSuccessError =
     await res.json();
   if (!json.success) throw new Error(json.message);
@@ -24,8 +24,8 @@ export const fetchData = async <S extends v.GenericSchema>(URL: string, schema: 
   return v.parse(schema, json.data);
 }
 
-export const fetchResponse = async <S extends v.GenericSchema>(URL: string, itemSchema: S): Promise<ApiSuccessResponseOutput<S>> => {
-  const res = await fetch(URL);
+export const fetchResponse = async <S extends v.GenericSchema>(URL: string, itemSchema: S, init?: RequestInit): Promise<ApiSuccessResponseOutput<S>> => {
+  const res = await fetch(URL, init);
   if (!res.ok) throw new Error("Connection Error");
   const json: ApiSuccessResponse<unknown> | ApiSuccessError =
     await res.json();
