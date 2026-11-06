@@ -10,6 +10,7 @@
 
   --color-hover: var(--color-blue-600);
 
+  --color-button: var(--color-primery);
   --color-hover-sidebar: var(--color-hover);
   --color-side-navigation: var(--color-primery);
   --color-table-head: var(--color-primery);
@@ -37,6 +38,9 @@ body {
   margin: 0;
 }
 
+dialog:not([open]) {
+    display: none;
+}
 
 @layer components {
   /* Cell spacing for data tables; change the variables to adjust it */
@@ -131,5 +135,50 @@ body {
   .pagination-button[aria-disabled="true"] {
     opacity: 0.4;
     cursor: not-allowed;
+  }
+
+  /*
+   * Grid of choice chips: as many equal columns as fit, stretched to the container width.
+   * Change --chip-min / --chip-max to adjust the chip width range.
+   */
+  .choice-list {
+    --chip-min: 5rem;
+    --chip-max: 10rem;
+
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--chip-min), 1fr));
+    gap: 0.25rem;
+  }
+
+  /* Selectable chip in the entry form (project radio, label checkbox); highlighted when its input is checked */
+  .choice-chip {
+    position: relative;
+    display: flex;
+    /* Fills its column, but never wider than the cap */
+    max-width: var(--chip-max);
+    border: 1px solid slategray;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    border-radius: 1rem;
+    cursor: pointer;
+  }
+
+  /* Long names are cut with an ellipsis instead of stretching the chip */
+  .choice-chip label {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .choice-chip:has(:checked) {
+    background: var(--color-hover);
+    order: -1;
+  }
+
+  .input-form {
+      padding: 0.5rem;
+      border: 1px solid slategray;
+      border-radius: 1rem;
   }
 }
