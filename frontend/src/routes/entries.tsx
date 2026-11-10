@@ -8,7 +8,6 @@ import type { Label } from "../../../backend/src/labels/labels.schema.ts";
 import { PendingConf } from "#/contants/config.ts";
 import { Pagination } from "#/componets/Pagination.tsx";
 import { Table, type TableColumn } from "#/componets/Table.tsx";
-import { Messages } from "#/contants/messages.ts";
 import { EntryItemColumn } from "#/componets/columnItems/EntryItemColumn.tsx";
 import { fetchProjects } from "#/api/api.projects.ts";
 import { fetchLabels } from "#/api/api.labels.ts";
@@ -17,6 +16,7 @@ import { fetchEntriesLabels } from "#/api/api.entriesLabels.ts";
 import type { Project } from "../../../backend/src/projects/projects.schema.ts";
 import { EntryForm } from "#/componets/dialogForms/EntryForm.tsx";
 import { useState } from "react";
+import { NotFound } from "#/componets/placeholders/NotFound.tsx";
 
 type LoaderResponse = {
   data: (Entries & { project_name: string } & { labels: Label[] })[];
@@ -158,13 +158,7 @@ function RouteComponent() {
         <Table columns={columns} items={items} />
 
         {/*placehoder if there is not entries */}
-        {items.length <= 0 ? (
-          <div className="flex h-full items-center justify-center">
-            {Messages.notFound}
-          </div>
-        ) : (
-          ""
-        )}
+        {items.length <= 0 ? <NotFound /> : ""}
       </section>
 
       {/* Pagination button */}

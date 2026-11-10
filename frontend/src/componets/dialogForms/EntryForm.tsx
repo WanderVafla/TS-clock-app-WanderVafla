@@ -16,6 +16,7 @@ import type { ActionState } from "#/shared/types.ts";
 import { TitleMessage } from "#/contants/messages.ts";
 import { getMessageError } from "#/shared/getMessageError.ts";
 import { ErrorMessageDisplay } from "#/componets/placeholders/ErrorMessageDisplay.tsx";
+import { NotFound } from "../placeholders/NotFound.tsx";
 
 const nameData = "entry" as const;
 
@@ -150,23 +151,26 @@ export function EntryForm({
 
         <h2>Projects</h2>
 
-        <div className="choice-list max-h-50 overflow-y-scroll">
-          {projects.map((p) => (
-            <div key={p.id} className="choice-chip text-center">
-              <label htmlFor={`project-${p.id}`}>{p.name}</label>
-              <input
-                id={`project-${p.id}`}
-                className="sr-only"
-                type="radio"
-                name="project_id"
-                value={p.id}
-                defaultChecked={entryItem?.project_id === p.id}
-                required
-              />
-            </div>
-          ))}
-        </div>
-
+        {projects.length <= 0 ? (
+          <NotFound />
+        ) : (
+          <div className="choice-list max-h-50 overflow-y-scroll">
+            {projects.map((p) => (
+              <div key={p.id} className="choice-chip text-center">
+                <label htmlFor={`project-${p.id}`}>{p.name}</label>
+                <input
+                  id={`project-${p.id}`}
+                  className="sr-only"
+                  type="radio"
+                  name="project_id"
+                  value={p.id}
+                  defaultChecked={entryItem?.project_id === p.id}
+                  required
+                />
+              </div>
+            ))}
+          </div>
+        )}
         <h2>Time</h2>
 
         <div className="flex flex-wrap gap-5 [&_div]:items-center">
@@ -201,22 +205,27 @@ export function EntryForm({
         </div>
 
         <h2 className="">labels</h2>
-
-        <div className="flex flex-col overflow-y-scroll max-h-100 gap-2">
-          {labels.map((l) => (
-            <div key={l.id} className="choice-chip">
-              <label htmlFor={`label-${l.id}`}>{l.name}</label>
-              <input
-                id={`label-${l.id}`}
-                className="sr-only"
-                name="labels"
-                type="checkbox"
-                value={l.id}
-                defaultChecked={entryItem?.labels.some((el) => el.id === l.id)}
-              />
-            </div>
-          ))}
-        </div>
+        {labels.length <= 0 ? (
+          <NotFound />
+        ) : (
+          <div className="flex flex-col overflow-y-scroll max-h-100 gap-2">
+            {labels.map((l) => (
+              <div key={l.id} className="choice-chip">
+                <label htmlFor={`label-${l.id}`}>{l.name}</label>
+                <input
+                  id={`label-${l.id}`}
+                  className="sr-only"
+                  name="labels"
+                  type="checkbox"
+                  value={l.id}
+                  defaultChecked={entryItem?.labels.some(
+                    (el) => el.id === l.id,
+                  )}
+                />
+              </div>
+            ))}
+          </div>
+        )}
         <div className="flex gap-5 self-end [&_button:hover]:cursor-pointer">
           <button
             className="bg-primery p-2 rounded-3xl"
