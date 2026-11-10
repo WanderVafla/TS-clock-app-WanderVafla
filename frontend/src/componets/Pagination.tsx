@@ -2,7 +2,7 @@ import { PaginationConf } from "#/contants/config";
 import { Link } from "@tanstack/react-router";
 import type { Metadata } from "../../../backend/src/share/schema";
 import type { EntriesSearch } from "#/api/api.types";
-import { range } from "#/action/range";
+import { range } from "#/shared/range";
 import {
   FirstPageIcon,
   LastPageIcon,

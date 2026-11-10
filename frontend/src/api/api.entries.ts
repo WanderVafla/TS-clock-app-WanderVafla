@@ -1,4 +1,4 @@
-import { fetchData, fetchResponse } from "#/action/fetchData.ts";
+import { fetchData, fetchResponse } from "#/shared/fetchData.ts";
 import { ErrorMessage } from "#/contants/messages.ts";
 import { API_URL } from "#/contants/url.ts";
 import { EntriesSchema, type CreateEntries, type Entries, type UpdateEntier } from "../../../backend/src/entries/entries.schema";

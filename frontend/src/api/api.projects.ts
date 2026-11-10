@@ -1,4 +1,4 @@
-import { fetchData } from "#/action/fetchData";
+import { fetchData } from "#/shared/fetchData";
 import { API_URL } from "#/contants/url";
 import { ProjectSchema } from "../../../backend/src/projects/projects.schema";
 import * as v from "valibot"

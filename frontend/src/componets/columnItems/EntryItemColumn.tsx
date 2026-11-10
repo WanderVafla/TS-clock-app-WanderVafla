@@ -1,4 +1,4 @@
-import { dateFormat, formatDuration } from "#/action/dateFormat";
+import { dateFormat, formatDuration } from "#/shared/dateFormat";
 import type { EntryItem } from "#/api/api.types";
 import { Description } from "../Description";
 import { Link } from "@tanstack/react-router";

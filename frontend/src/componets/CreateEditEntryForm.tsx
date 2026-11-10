@@ -1,6 +1,6 @@
 import { useActionState, useEffect, useRef } from "react";
 import * as v from "valibot";
-import { toDateTimeLocal } from "#/action/dateFormat.ts";
+import { toDateTimeLocal } from "#/shared/dateFormat.ts";
 import { createEntry, updateEntry } from "#/api/api.entries.ts";
 import type { Label } from "../../../backend/src/labels/labels.schema.ts";
 import type { Project } from "../../../backend/src/projects/projects.schema.ts";

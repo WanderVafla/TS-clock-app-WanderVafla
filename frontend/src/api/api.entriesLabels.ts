@@ -1,4 +1,4 @@
-import { fetchData } from "#/action/fetchData";
+import { fetchData } from "#/shared/fetchData";
 import { API_URL } from "#/contants/url";
 import * as v from "valibot"
 import { EntryLabelLinkSchema } from "../../../backend/src/entries_labels/entries_labels.schema";
