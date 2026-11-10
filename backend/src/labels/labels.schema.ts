@@ -13,6 +13,8 @@ export const LabelSchema = v.object({
   ),
 });
 
+export const CreateLabelSchema = v.pick(LabelSchema, FieldColumnNames);
+
 export const UpdateLabelSchema = v.pipe(
   v.object({
     id: LabelSchema.entries.id,
@@ -25,4 +27,5 @@ export const UpdateLabelSchema = v.pipe(
 );
 
 export type Label = v.InferOutput<typeof LabelSchema>;
+export type CreateLabel = v.InferOutput<typeof CreateLabelSchema>;
 export type UpdateLabel = v.InferOutput<typeof UpdateLabelSchema>;

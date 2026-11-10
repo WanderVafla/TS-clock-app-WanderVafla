@@ -1,4 +1,4 @@
-import type { Label, UpdateLabel } from "./labels.schema";
+import type { CreateLabel, Label, UpdateLabel } from "./labels.schema";
 import { InternalError, NotFoundError } from "../share/errors";
 import { DatabaseTableNames } from "../share/constants";
 import { pg } from "../share/db";
@@ -11,7 +11,7 @@ export const getLabels = async (): Promise<Label[]> => {
   return query;
 };
 
-export const createLabel = async (label: Omit<Label, "id">): Promise<Label> => {
+export const createLabel = async (label: CreateLabel): Promise<Label> => {
   const query: Label[] =
     await pg`insert into ${pg(table_name)} ${pg(label)} RETURNING *;`;
 
