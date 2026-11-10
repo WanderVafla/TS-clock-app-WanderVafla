@@ -1,6 +1,5 @@
 import { useActionState, useEffect, useRef } from "react";
 import { useRouter } from "@tanstack/react-router";
-import * as v from "valibot";
 import {
   CreateLabelSchema,
   UpdateLabelSchema,
@@ -11,8 +10,8 @@ import {
 import { createLabel, updateLabel } from "#/api/api.labels";
 import type { ActionState } from "#/shared/types";
 import { TitleMessage } from "#/contants/messages";
-import { getMessageError } from "#/shared/getMessageError";
 import { ErrorMessageDisplay } from "#/componets/placeholders/ErrorMessageDisplay";
+import { saveFormAction } from "#/shared/saveAction";
 
 type CreateEditProjectFormProps = { labelItem: Label | null } & {
   onClose: () => void;
@@ -33,16 +32,18 @@ export function LabelForm({ labelItem, onClose }: CreateEditProjectFormProps) {
   }, []);
 
   const [state, formAction, isPending] = useActionState(
-    (prev: ActionState, formData: FormData) =>
-      saveLabelAction(
-        async () => {
+    (_prev: ActionState, formData: FormData) =>
+      saveFormAction<Label, CreateLabel, UpdateLabel>({
+        createSchema: CreateLabelSchema,
+        updateSchema: UpdateLabelSchema,
+        create: createLabel,
+        update: updateLabel,
+        formData: formData,
+        onSuccess: async () => {
           await router.invalidate();
           onClose();
         },
-        labelItem,
-        prev,
-        formData,
-      ),
+      }),
     {
       error: null,
     },
@@ -92,33 +93,3 @@ export function LabelForm({ labelItem, onClose }: CreateEditProjectFormProps) {
     </dialog>
   );
 }
-
-const saveLabelAction = async (
-  onSuccess: () => Promise<void>,
-  labelItem: Label | null,
-  _prev: ActionState,
-  formData: FormData,
-) => {
-  try {
-    const id = Number(formData.get("id"));
-    const name = String(formData.get("name"));
-
-    const item: CreateLabel | UpdateLabel = { name, id };
-
-    if (id) {
-      if (labelItem) {
-        const data = v.parse(UpdateLabelSchema, item);
-        await updateLabel(data);
-        await onSuccess();
-      }
-    } else {
-      const data = v.parse(CreateLabelSchema, item);
-      await createLabel(data);
-      await onSuccess();
-    }
-
-    return { error: null };
-  } catch (e) {
-    return { error: getMessageError(e) };
-  }
-};

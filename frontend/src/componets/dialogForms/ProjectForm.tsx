@@ -8,11 +8,10 @@ import {
 } from "../../../../backend/src/projects/projects.schema";
 import { createProject, updateProject } from "#/api/api.projects";
 import { useRouter } from "@tanstack/react-router";
-import * as v from "valibot";
 import type { ActionState } from "#/shared/types";
 import { TitleMessage } from "#/contants/messages";
-import { getMessageError } from "#/shared/getMessageError";
 import { ErrorMessageDisplay } from "#/componets/placeholders/ErrorMessageDisplay";
+import { saveFormAction } from "#/shared/saveAction";
 
 type CreateEditProjectFormProps = { projectItem: Project | null } & {
   onClose: () => void;
@@ -36,16 +35,18 @@ export function ProjectForm({
   }, []);
 
   const [state, formAction, isPending] = useActionState(
-    (prev: ActionState, formData: FormData) =>
-      saveProjectAction(
-        async () => {
+    (_prev: ActionState, formData: FormData) =>
+      saveFormAction<Project, CreateProject, UpdateProject>({
+        createSchema: CreateProjectSchema,
+        updateSchema: UpdateProjectSchema,
+        create: createProject,
+        update: updateProject,
+        formData: formData,
+        onSuccess: async () => {
           await router.invalidate();
           onClose();
         },
-        projectItem,
-        prev,
-        formData,
-      ),
+      }),
     {
       error: null,
     },
@@ -95,33 +96,3 @@ export function ProjectForm({
     </dialog>
   );
 }
-
-const saveProjectAction = async (
-  onSuccess: () => Promise<void>,
-  projectItem: Project | null,
-  _prev: ActionState,
-  formData: FormData,
-) => {
-  try {
-    const id = Number(formData.get("id"));
-    const name = String(formData.get("name"));
-
-    const item: CreateProject | UpdateProject = { name, id };
-
-    if (id) {
-      if (projectItem) {
-        const data = v.parse(UpdateProjectSchema, item);
-        await updateProject(data);
-        await onSuccess();
-      }
-    } else {
-      const data = v.parse(CreateProjectSchema, item);
-      await createProject(data);
-      await onSuccess();
-    }
-
-    return { error: null };
-  } catch (e) {
-    return { error: getMessageError(e) };
-  }
-};
