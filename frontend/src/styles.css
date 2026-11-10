@@ -52,6 +52,13 @@ dialog:not([open]) {
   h2 {
     @apply font-medium text-3xl tracking-widest;
   }
+
+  .button-add {
+      @apply p-3 bg-button rounded-2xl self-end cursor-pointer;
+  }
+  tr {
+      @apply border-b border-b-table-border;
+  }
 }
 
 @layer components {

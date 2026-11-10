@@ -137,7 +137,7 @@ function RouteComponent() {
       </header>
 
       <button
-        className="p-3 bg-button rounded-2xl self-end cursor-pointer"
+        className="button-add"
         onClick={() => setDialogEntry(null)}
         type="button"
       >

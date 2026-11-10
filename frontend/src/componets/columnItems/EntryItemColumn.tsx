@@ -27,7 +27,7 @@ export function EntryItemColumn({onEdit, ...entryProp}: EntryItemColumnProps ) {
     : "Now";
 
   return (
-    <tr className="border-b border-b-table-border ">
+    <tr>
       <td>
         <Description text={description ?? "Not description"} />
       </td>
@@ -36,7 +36,6 @@ export function EntryItemColumn({onEdit, ...entryProp}: EntryItemColumnProps ) {
       <td>
         <LabelList labels={labels ?? []} />
       </td>
-
       <td>{startDate}</td>
       <td>{endDate}</td>
       <td>{duration}</td>
