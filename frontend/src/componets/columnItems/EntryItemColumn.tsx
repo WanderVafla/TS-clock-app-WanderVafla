@@ -9,7 +9,10 @@ type EntryItemColumnProps = EntryItem & {
   onEdit: () => void;
 };
 
-export function EntryItemColumn({onEdit, ...entryProp}: EntryItemColumnProps ) {
+export function EntryItemColumn({
+  onEdit,
+  ...entryProp
+}: EntryItemColumnProps) {
   const {
     id,
     description,
@@ -29,7 +32,7 @@ export function EntryItemColumn({onEdit, ...entryProp}: EntryItemColumnProps ) {
   return (
     <tr>
       <td>
-        <Description text={description ?? "Not description"} />
+        <Description text={description ?? ""} />
       </td>
       <td id={`${project_id}`}>{project_name}</td>
 
