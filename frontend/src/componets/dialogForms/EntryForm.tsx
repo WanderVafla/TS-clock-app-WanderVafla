@@ -2,20 +2,22 @@ import { useActionState, useEffect, useRef } from "react";
 import * as v from "valibot";
 import { toDateTimeLocal } from "#/shared/dateFormat.ts";
 import { createEntry, updateEntry } from "#/api/api.entries.ts";
-import type { Label } from "../../../backend/src/labels/labels.schema.ts";
-import type { Project } from "../../../backend/src/projects/projects.schema.ts";
+import type { Label } from "../../../../backend/src/labels/labels.schema.ts";
+import type { Project } from "../../../../backend/src/projects/projects.schema.ts";
 import {
   CreateEntriesSchema,
   UpdateEntriesSchema,
   type CreateEntries,
   type UpdateEntier,
-} from "../../../backend/src/entries/entries.schema.ts";
+} from "../../../../backend/src/entries/entries.schema.ts";
 import type { EntryItem } from "#/api/api.types.ts";
 import { useRouter } from "@tanstack/react-router";
+import type { ActionState } from "#/shared/types.ts";
+import { TitleMessage } from "#/contants/messages.ts";
+import { getMessageError } from "#/shared/getMessageError.ts";
+import { ErrorMessageDisplay } from "#/componets/placeholders/ErrorMessageDisplay.tsx";
 
-type CreateEntryState = {
-  error: string | null;
-};
+const nameData = "entry" as const;
 
 const changedTime = (
   input: string,
@@ -33,7 +35,7 @@ const changedTime = (
 async function saveEntryAction(
   onSuccess: () => Promise<void>,
   entryItem: EntryItem | null,
-  _prev: CreateEntryState,
+  _prev: ActionState,
   formData: FormData,
 ) {
   try {
@@ -81,11 +83,11 @@ async function saveEntryAction(
 
     return { error: null };
   } catch (e) {
-    return { error: e instanceof Error ? e.message : "Unknown error" };
+    return { error: getMessageError(e) };
   }
 }
 
-export function CreateEditEntryForm({
+export function EntryForm({
   projects,
   labels,
   entryItem,
@@ -108,7 +110,7 @@ export function CreateEditEntryForm({
   }, []);
 
   const [state, formAction, isPending] = useActionState(
-    (prev: CreateEntryState, formData: FormData) =>
+    (prev: ActionState, formData: FormData) =>
       saveEntryAction(
         async () => {
           await router.invalidate();
@@ -121,11 +123,6 @@ export function CreateEditEntryForm({
     { error: null },
   );
 
-  // Display errors to console
-  if (state.error) {
-    console.error(state.error);
-  }
-
   return (
     <dialog
       className="md:w-1/3 p-5 gap-10 flex flex-col justify-self-center self-center rounded-2xl"
@@ -133,14 +130,13 @@ export function CreateEditEntryForm({
       // Fires for Esc too, so the parent unmounts the dialog however it was closed
       onClose={onClose}
     >
-      <div
-        className="flex flex-wrap text-red-600 justify-center tracking-wide"
-        style={!state.error ? { display: "none" } : undefined}
-      >
-        {state.error}
-      </div>
+      <ErrorMessageDisplay error={state.error} />
 
-      <h1>{entryItem?.id ? "Edit Entry" : "Create Entry"}</h1>
+      <h1>
+        {entryItem?.id
+          ? TitleMessage.edit(nameData)
+          : TitleMessage.create(nameData)}
+      </h1>
 
       <form action={formAction} className="flex flex-col gap-5">
         <input name="id" type="hidden" value={entryItem?.id} />

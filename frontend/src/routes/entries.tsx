@@ -15,7 +15,7 @@ import { fetchLabels } from "#/api/api.labels.ts";
 import type { Entries } from "../../../backend/src/entries/entries.schema.ts";
 import { fetchEntriesLabels } from "#/api/api.entriesLabels.ts";
 import type { Project } from "../../../backend/src/projects/projects.schema.ts";
-import { CreateEditEntryForm } from "#/componets/CreateEditEntryForm.tsx";
+import { EntryForm } from "#/componets/dialogForms/EntryForm.tsx";
 import { useState } from "react";
 
 type LoaderResponse = {
@@ -146,7 +146,7 @@ function RouteComponent() {
 
       {/* Rendered only while open, so every opening starts with a fresh form and no stale error */}
       {dialogEntry !== undefined && (
-        <CreateEditEntryForm
+        <EntryForm
           projects={projects}
           labels={labels}
           entryItem={dialogEntry}
