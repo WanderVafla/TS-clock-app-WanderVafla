@@ -139,6 +139,7 @@ function RouteComponent() {
       <button
         className="button-add"
         onClick={() => setDialogEntry(null)}
+        aria-label="Create entry"
         type="button"
       >
         Add Entry

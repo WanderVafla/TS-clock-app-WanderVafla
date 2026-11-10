@@ -26,7 +26,7 @@ export function LabelItemColumn({ id, name, onEdit, onError }: LabelItemType) {
       <td>{name}</td>
       <td>
         <div>
-          <button className="cursor-pointer" type="button" onClick={onEdit}>
+          <button className="cursor-pointer" type="button" aria-label="Edit label" onClick={onEdit}>
             <EditIcon />
           </button>
           <button

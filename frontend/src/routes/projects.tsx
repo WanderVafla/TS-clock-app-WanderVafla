@@ -69,6 +69,7 @@ function RouteComponent() {
       <button
         className="button-add"
         type="button"
+        aria-label="Create project"
         onClick={() => setDialogProject(null)}
       >
         Create Project

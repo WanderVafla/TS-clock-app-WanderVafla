@@ -33,7 +33,7 @@ export function ProjectItemColumn({
       <td>{dateFormat.format(new Date(created_at ?? ""))}</td>
       <td>
         <div>
-          <button className="cursor-pointer" type="button" onClick={onEdit}>
+          <button className="cursor-pointer" type="button" aria-label="Edit project" onClick={onEdit}>
             <EditIcon />
           </button>
           <button
