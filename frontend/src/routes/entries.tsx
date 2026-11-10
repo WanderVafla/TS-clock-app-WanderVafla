@@ -131,7 +131,7 @@ function RouteComponent() {
   });
 
   return (
-    <main className="p-4 md:p-10 h-dvh flex flex-col gap-10 items-center">
+    <main className="p-3 sm:p-4 md:p-10 min-h-dvh w-full min-w-0 flex flex-col gap-4 md:gap-8">
       <header className="self-start">
         <h1 className="font-medium text-5xl tracking-widest">Planing</h1>
       </header>

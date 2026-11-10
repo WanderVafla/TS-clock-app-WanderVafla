@@ -12,35 +12,35 @@ export function SideNavigation() {
       <nav className="[&_div:hover_svg]:text-hover-sidebar [&_div:hover_p]:text-hover-sidebar flex flex-row md:flex-col gap-2">
         <div>
           <Link
-            className="p-2 flex flex-row md:flex-col text-2xl items-center gap-2 md:gap-1"
+            className="p-1 md:p-2 flex flex-col text-2xl items-center gap-1"
             to="/entries"
           >
             <div>
               <EntriesIcon />
             </div>
-            <p className="text-base md:text-xl">Planing</p>
+            <p className="text-xs md:text-xl">Planing</p>
           </Link>
         </div>
         <div>
           <Link
-            className="p-2 flex flex-row md:flex-col text-2xl items-center gap-2 md:gap-1"
+            className="p-1 md:p-2 flex flex-col text-2xl items-center gap-1"
             to="/projects"
           >
             <div>
               <ProjectsIcon />
             </div>
-            <p className="text-base md:text-xl">Projects</p>
+            <p className="text-xs md:text-xl">Projects</p>
           </Link>
         </div>
         <div>
           <Link
-            className="p-2 flex flex-row md:flex-col text-2xl items-center gap-2 md:gap-1"
+            className="p-1 md:p-2 flex flex-col text-2xl items-center gap-1"
             to="/labels"
           >
             <div>
               <LabelsIcon />
             </div>
-            <p className="text-base md:text-xl">Labels</p>
+            <p className="text-xs md:text-xl">Labels</p>
           </Link>
         </div>
       </nav>
