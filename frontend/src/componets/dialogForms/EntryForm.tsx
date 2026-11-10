@@ -1,92 +1,21 @@
 import { useActionState, useEffect, useRef } from "react";
-import * as v from "valibot";
-import { toDateTimeLocal } from "#/shared/dateFormat.ts";
 import { createEntry, updateEntry } from "#/api/api.entries.ts";
 import type { Label } from "../../../../backend/src/labels/labels.schema.ts";
 import type { Project } from "../../../../backend/src/projects/projects.schema.ts";
 import {
   CreateEntriesSchema,
   UpdateEntriesSchema,
-  type CreateEntries,
-  type UpdateEntier,
 } from "../../../../backend/src/entries/entries.schema.ts";
 import type { EntryItem } from "#/api/api.types.ts";
 import { useRouter } from "@tanstack/react-router";
 import type { ActionState } from "#/shared/types.ts";
 import { TitleMessage } from "#/contants/messages.ts";
-import { getMessageError } from "#/shared/getMessageError.ts";
 import { ErrorMessageDisplay } from "#/componets/placeholders/ErrorMessageDisplay.tsx";
 import { NotFound } from "../placeholders/NotFound.tsx";
+import { IsoDateTimeInput } from "#/componets/inputs/IsoDateTimeInput.tsx";
+import { saveFormAction } from "#/shared/saveAction.ts";
 
 const nameData = "entry" as const;
-
-const changedTime = (
-  input: string,
-  original: string | undefined | null,
-): string | null | undefined => {
-  const originalInput = original ? toDateTimeLocal(original) : "";
-  const unchanged =
-    input && originalInput
-      ? new Date(input).getTime() === new Date(originalInput).getTime()
-      : input === originalInput;
-  if (unchanged) return undefined;
-  return input ? new Date(input).toISOString() : null;
-};
-
-async function saveEntryAction(
-  onSuccess: () => Promise<void>,
-  entryItem: EntryItem | null,
-  _prev: ActionState,
-  formData: FormData,
-) {
-  try {
-    const id: number | null = Number(String(formData.get("id")).trim());
-    const start_time = String(formData.get("start_time"));
-    const end_time = String(formData.get("end_time"));
-    const description = String(formData.get("description"));
-    const labels = formData.getAll("labels").map(Number);
-
-    const isoDateStartTime = new Date(start_time).toISOString();
-    const isoDateEndTime = end_time.trim()
-      ? new Date(end_time).toISOString()
-      : null;
-
-    const project_id = Number(formData.get("project_id"));
-
-    const item: CreateEntries | UpdateEntier = {
-      id,
-      project_id,
-      start_time: isoDateStartTime,
-      end_time: isoDateEndTime,
-      description,
-      label: labels,
-    };
-
-    if (id) {
-      if (entryItem) {
-        const Editeditem: CreateEntries | UpdateEntier = {
-          id,
-          project_id,
-          start_time:
-            changedTime(start_time, entryItem?.start_time) ??
-            entryItem.start_time,
-          end_time: changedTime(end_time, entryItem?.end_time),
-          description: description.trim() === "" ? null : description,
-          label: labels,
-        };
-        await updateEntry(v.parse(UpdateEntriesSchema, Editeditem));
-        await onSuccess();
-      }
-    } else {
-      await createEntry(v.parse(CreateEntriesSchema, item));
-      await onSuccess();
-    }
-
-    return { error: null };
-  } catch (e) {
-    return { error: getMessageError(e) };
-  }
-}
 
 export function EntryForm({
   projects,
@@ -111,16 +40,18 @@ export function EntryForm({
   }, []);
 
   const [state, formAction, isPending] = useActionState(
-    (prev: ActionState, formData: FormData) =>
-      saveEntryAction(
-        async () => {
+    (_prev: ActionState, formData: FormData) =>
+      saveFormAction({
+        onSuccess: async () => {
           await router.invalidate();
           onClose();
         },
-        entryItem,
-        prev,
-        formData,
-      ),
+        create: createEntry,
+        update: updateEntry,
+        createSchema: CreateEntriesSchema,
+        updateSchema: UpdateEntriesSchema,
+        formData: formData,
+      }),
     { error: null },
   );
 
@@ -175,31 +106,23 @@ export function EntryForm({
 
         <div className="flex flex-wrap gap-5 [&_div]:items-center">
           <div className="flex gap-2">
-            <label className="" htmlFor="start-time">
-              Start
-            </label>
-            <input
-              step={1}
+            <label htmlFor="start-time">Start</label>
+            <IsoDateTimeInput
+              id="start-time"
               className="input-form"
-              type="datetime-local"
               name="start_time"
-              defaultValue={
-                entryItem ? toDateTimeLocal(entryItem.start_time) : ""
-              }
+              defaultValue={entryItem?.start_time}
               required
             />
           </div>
 
           <div className="flex gap-2">
-            <label htmlFor="start-time">End</label>
-            <input
-              step={1}
+            <label htmlFor="end-time">End</label>
+            <IsoDateTimeInput
+              id="end-time"
               className="input-form"
-              type="datetime-local"
-              defaultValue={
-                entryItem?.end_time ? toDateTimeLocal(entryItem.end_time) : ""
-              }
               name="end_time"
+              defaultValue={entryItem?.end_time}
             />
           </div>
         </div>
@@ -209,13 +132,15 @@ export function EntryForm({
           <NotFound />
         ) : (
           <div className="flex flex-col overflow-y-scroll max-h-100 gap-2">
+            <input name="label[]" type="hidden" value={""} />
             {labels.map((l) => (
               <div key={l.id} className="choice-chip">
                 <label htmlFor={`label-${l.id}`}>{l.name}</label>
                 <input
                   id={`label-${l.id}`}
                   className="sr-only"
-                  name="labels"
+                  // WARNING: name must be like into schema. `[]` meat array, we need it for parsing when submit.
+                  name="label[]"
                   type="checkbox"
                   value={l.id}
                   defaultChecked={entryItem?.labels.some(
