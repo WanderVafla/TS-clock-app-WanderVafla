@@ -73,6 +73,37 @@ export const Route = createFileRoute("/entries")({
   pendingMs: PendingConf.pendingMs,
 });
 
+const columns: TableColumn[] = [
+  {
+    title: "Description",
+    width: 21,
+  },
+  {
+    title: "Project",
+    width: 9,
+  },
+  {
+    title: "Label",
+    width: 26,
+  },
+  {
+    title: "Start",
+    width: 13,
+  },
+  {
+    title: "End",
+    width: 13,
+  },
+  {
+    title: "Duration",
+    width: 9,
+  },
+  {
+    title: "Actions",
+    width: 9,
+  },
+] as const;
+
 function RouteComponent() {
   const search = Route.useSearch();
   const { data, metadata, projects, labels }: LoaderResponse =
@@ -82,38 +113,6 @@ function RouteComponent() {
   const [dialogEntry, setDialogEntry] = useState<EntryItem | null | undefined>(
     undefined,
   );
-
-  const columns: TableColumn[] = [
-    {
-      title: "Description",
-      width: 21,
-    },
-    {
-      title: "Project",
-      width: 9,
-    },
-    {
-      title: "Label",
-      width: 26,
-    },
-    {
-      title: "Start",
-      width: 13,
-    },
-    {
-      title: "End",
-      width: 13,
-    },
-    {
-      title: "Duration",
-      width: 9,
-    },
-    {
-      title: "Actions",
-      width: 9,
-    },
-  ];
-
   const items = data.map((e) => {
     return (
       <EntryItemColumn

@@ -19,6 +19,25 @@ export const Route = createFileRoute("/projects")({
   component: RouteComponent,
 });
 
+const columns: TableColumn[] = [
+  {
+    title: "id",
+    width: 20,
+  },
+  {
+    title: "Name",
+    width: 30,
+  },
+  {
+    title: "Created",
+    width: 25,
+  },
+  {
+    title: "Actions",
+    width: 25,
+  },
+] as const;
+
 function RouteComponent() {
   const projects = Route.useLoaderData();
 
@@ -31,25 +50,6 @@ function RouteComponent() {
   const handleError = (errorText: string | null) => {
     setError(errorText);
   };
-
-  const columns: TableColumn[] = [
-    {
-      title: "id",
-      width: 20,
-    },
-    {
-      title: "Name",
-      width: 30,
-    },
-    {
-      title: "Created",
-      width: 25,
-    },
-    {
-      title: "Actions",
-      width: 25,
-    },
-  ];
 
   const items = projects.map((p) => (
     <ProjectItemColumn
