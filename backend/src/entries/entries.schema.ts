@@ -1,5 +1,6 @@
 import * as v from "valibot";
 import {
+  emptyToNull,
   idQuerySchema,
   paginationParamsSchema,
   stringSchema,
@@ -30,11 +31,15 @@ export const EntriesBase = v.object({
     v.isoTimestamp(ValidationError.DateNotCorrect),
   ),
   end_time: v.nullish(
-    v.pipe(v.string(), v.isoTimestamp(ValidationError.DateNotCorrect)),
+    emptyToNull(
+      v.pipe(v.string(), v.isoTimestamp(ValidationError.DateNotCorrect)),
+    ),
   ),
-  description: v.nullish(v.pipe(stringSchema)),
+  description: v.nullish(emptyToNull(stringSchema)),
   project_id: idQuerySchema,
 });
+
+
 
 export const labelIdSchema = v.array(idQuerySchema);
 
@@ -57,7 +62,7 @@ export const CreateEntriesSchema = v.pipe(
   v.object({
     project_id: EntriesBase.entries.project_id,
     start_time: EntriesBase.entries.start_time,
-    end_time: v.nullish(EntriesBase.entries.end_time),
+    end_time: EntriesBase.entries.end_time,
     ...v.partial(v.pick(EntriesBase, FieldColumnNames)).entries,
     label: v.optional(labelIdSchema),
   }),
