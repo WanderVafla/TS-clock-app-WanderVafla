@@ -2,7 +2,7 @@ import { PaginationConf } from "#/contants/config";
 import { Link } from "@tanstack/react-router";
 import type { Metadata } from "../../../backend/src/share/schema";
 import type { EntriesSearch } from "#/api/api.types";
-import { range } from "#/action/range";
+import { range } from "#/shared/range";
 import {
   FirstPageIcon,
   LastPageIcon,
@@ -17,7 +17,7 @@ export function Pagination({ metadata, search }: PaginationProp) {
   const { page, sizePage } = search;
   
   return (
-    <div className="pagination flex gap-5">
+    <div className="pagination flex flex-wrap gap-2 md:gap-5">
       <Link
         to="/entries"
         search={{ page: 1, sizePage }}

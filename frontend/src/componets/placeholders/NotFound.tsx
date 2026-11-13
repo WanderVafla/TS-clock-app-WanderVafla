@@ -1,5 +1,5 @@
 export function NotFound() {
-  return <div className="flex w-dvw justify-center items-center text-5xl font-bold tracking-widest">
+  return <div className="flex h-full items-center justify-center">
     Not Found
   </div>;
 }

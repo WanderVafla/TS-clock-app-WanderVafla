@@ -7,7 +7,7 @@ import { ErrorMessage } from "#/contants/messages.ts";
 import type { Entries } from "../../../backend/src/entries/entries.schema";
 import type { Label } from "../../../backend/src/labels/labels.schema.ts";
 import { LabelItem } from "#/componets/LabelItem.tsx";
-import { dateFormat } from "#/action/dateFormat.ts";
+import { dateFormat } from "#/shared/dateFormat.ts";
 import { NotFound } from "#/componets/placeholders/NotFound.tsx";
 import { Pending } from "#/componets/placeholders/Pending.tsx";
 import { ErrorDisplay } from "#/componets/placeholders/ErrorDisplay.tsx";

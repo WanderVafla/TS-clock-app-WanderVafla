@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EntriesRouteImport } from './routes/entries'
+import { Route as LabelsRouteImport } from './routes/labels'
+import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as EntryEntryIdRouteImport } from './routes/entry.$entryId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -23,6 +25,16 @@ const EntriesRoute = EntriesRouteImport.update({
   path: '/entries',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LabelsRoute = LabelsRouteImport.update({
+  id: '/labels',
+  path: '/labels',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjectsRoute = ProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EntryEntryIdRoute = EntryEntryIdRouteImport.update({
   id: '/entry/$entryId',
   path: '/entry/$entryId',
@@ -32,30 +44,39 @@ const EntryEntryIdRoute = EntryEntryIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/entries': typeof EntriesRoute
+  '/labels': typeof LabelsRoute
+  '/projects': typeof ProjectsRoute
   '/entry/$entryId': typeof EntryEntryIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/entries': typeof EntriesRoute
+  '/labels': typeof LabelsRoute
+  '/projects': typeof ProjectsRoute
   '/entry/$entryId': typeof EntryEntryIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/entries': typeof EntriesRoute
+  '/labels': typeof LabelsRoute
+  '/projects': typeof ProjectsRoute
   '/entry/$entryId': typeof EntryEntryIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/entries' | '/entry/$entryId'
+  fullPaths: '/' | '/entries' | '/labels' | '/projects' | '/entry/$entryId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/entries' | '/entry/$entryId'
-  id: '__root__' | '/' | '/entries' | '/entry/$entryId'
+  to: '/' | '/entries' | '/labels' | '/projects' | '/entry/$entryId'
+  id:
+    '__root__' | '/' | '/entries' | '/labels' | '/projects' | '/entry/$entryId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   EntriesRoute: typeof EntriesRoute
+  LabelsRoute: typeof LabelsRoute
+  ProjectsRoute: typeof ProjectsRoute
   EntryEntryIdRoute: typeof EntryEntryIdRoute
 }
 
@@ -75,6 +96,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EntriesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/labels': {
+      id: '/labels'
+      path: '/labels'
+      fullPath: '/labels'
+      preLoaderRoute: typeof LabelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projects': {
+      id: '/projects'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof ProjectsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/entry/$entryId': {
       id: '/entry/$entryId'
       path: '/entry/$entryId'
@@ -88,6 +123,8 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   EntriesRoute: EntriesRoute,
+  LabelsRoute: LabelsRoute,
+  ProjectsRoute: ProjectsRoute,
   EntryEntryIdRoute: EntryEntryIdRoute,
 }
 export const routeTree = rootRouteImport

@@ -1,7 +1,7 @@
 import Elysia from "elysia";
 import { idQuerySchema } from "../share/schema";
 import * as v from "valibot";
-import { LabelSchema, type UpdateLabel, UpdateLabelSchema } from "./labels.schema";
+import { CreateLabelSchema, type UpdateLabel, UpdateLabelSchema } from "./labels.schema";
 import { createLabel, deleteLabel, getLabels, updateLabel } from "./labels.repository";
 import { DescriptionDocs } from "../share/constants";
 import { respondSuccess } from "../share/response";
@@ -19,7 +19,7 @@ export const labelsRoute = new Elysia({ prefix: "/labels" })
 			return respondSuccess(data, set.status);
 		},
 		{
-			body: v.omit(LabelSchema, ["id"]),
+			body: CreateLabelSchema,
 		},
 	)
 	.delete(

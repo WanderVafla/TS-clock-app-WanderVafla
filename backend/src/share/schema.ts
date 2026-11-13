@@ -40,6 +40,17 @@ export const stringSchema = v.pipe(
   v.check((s) => !s.includes("\0"), ValidationError.NulByteError),
 );
 
+/* Treats an empty (or whitespace-only) string as null, then validates the rest with `schema` */
+export const emptyToNull = <TSchema extends v.GenericSchema<string, unknown>>(
+  schema: TSchema,
+) =>
+  v.pipe(
+    v.string(),
+    v.trim(),
+    v.transform((s) => (s === "" ? null : s)),
+    v.nullable(schema),
+  );
+
 export const paginationParamsSchema = v.object({
   page: v.optional(idQuerySchema),
   sizePage: v.optional(

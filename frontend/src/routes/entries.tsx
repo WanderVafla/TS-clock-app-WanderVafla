@@ -8,15 +8,15 @@ import type { Label } from "../../../backend/src/labels/labels.schema.ts";
 import { PendingConf } from "#/contants/config.ts";
 import { Pagination } from "#/componets/Pagination.tsx";
 import { Table, type TableColumn } from "#/componets/Table.tsx";
-import { Messages } from "#/contants/messages.ts";
 import { EntryItemColumn } from "#/componets/columnItems/EntryItemColumn.tsx";
 import { fetchProjects } from "#/api/api.projects.ts";
 import { fetchLabels } from "#/api/api.labels.ts";
 import type { Entries } from "../../../backend/src/entries/entries.schema.ts";
 import { fetchEntriesLabels } from "#/api/api.entriesLabels.ts";
 import type { Project } from "../../../backend/src/projects/projects.schema.ts";
-import { CreateEditEntryForm } from "#/componets/CreateEditEntryForm.tsx";
+import { EntryForm } from "#/componets/dialogForms/EntryForm.tsx";
 import { useState } from "react";
+import { NotFound } from "#/componets/placeholders/NotFound.tsx";
 
 type LoaderResponse = {
   data: (Entries & { project_name: string } & { labels: Label[] })[];
@@ -73,6 +73,37 @@ export const Route = createFileRoute("/entries")({
   pendingMs: PendingConf.pendingMs,
 });
 
+const columns: TableColumn[] = [
+  {
+    title: "Description",
+    width: 21,
+  },
+  {
+    title: "Project",
+    width: 9,
+  },
+  {
+    title: "Label",
+    width: 26,
+  },
+  {
+    title: "Start",
+    width: 13,
+  },
+  {
+    title: "End",
+    width: 13,
+  },
+  {
+    title: "Duration",
+    width: 9,
+  },
+  {
+    title: "Actions",
+    width: 9,
+  },
+] as const;
+
 function RouteComponent() {
   const search = Route.useSearch();
   const { data, metadata, projects, labels }: LoaderResponse =
@@ -82,38 +113,6 @@ function RouteComponent() {
   const [dialogEntry, setDialogEntry] = useState<EntryItem | null | undefined>(
     undefined,
   );
-
-  const columns: TableColumn[] = [
-    {
-      title: "Description",
-      width: 21,
-    },
-    {
-      title: "Project",
-      width: 9,
-    },
-    {
-      title: "Label",
-      width: 26,
-    },
-    {
-      title: "Start",
-      width: 13,
-    },
-    {
-      title: "End",
-      width: 13,
-    },
-    {
-      title: "Duration",
-      width: 9,
-    },
-    {
-      title: "Actions",
-      width: 9,
-    },
-  ];
-
   const items = data.map((e) => {
     return (
       <EntryItemColumn
@@ -131,14 +130,15 @@ function RouteComponent() {
   });
 
   return (
-    <main className="p-4 md:p-10 h-dvh flex flex-col gap-10 items-center">
+    <main className="p-3 sm:p-4 md:p-10 min-h-dvh w-full min-w-0 flex flex-col gap-4 md:gap-8">
       <header className="self-start">
         <h1 className="font-medium text-5xl tracking-widest">Planing</h1>
       </header>
 
       <button
-        className="p-3 bg-button rounded-2xl self-end cursor-pointer"
+        className="button-add"
         onClick={() => setDialogEntry(null)}
+        aria-label="Create entry"
         type="button"
       >
         Add Entry
@@ -146,7 +146,7 @@ function RouteComponent() {
 
       {/* Rendered only while open, so every opening starts with a fresh form and no stale error */}
       {dialogEntry !== undefined && (
-        <CreateEditEntryForm
+        <EntryForm
           projects={projects}
           labels={labels}
           entryItem={dialogEntry}
@@ -158,13 +158,7 @@ function RouteComponent() {
         <Table columns={columns} items={items} />
 
         {/*placehoder if there is not entries */}
-        {items.length <= 0 ? (
-          <div className="flex h-full items-center justify-center">
-            {Messages.notFound}
-          </div>
-        ) : (
-          ""
-        )}
+        {items.length <= 0 ? <NotFound /> : ""}
       </section>
 
       {/* Pagination button */}

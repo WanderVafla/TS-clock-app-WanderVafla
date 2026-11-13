@@ -1,4 +1,4 @@
-import { dateFormat, formatDuration } from "#/action/dateFormat";
+import { dateFormat, formatDuration } from "#/shared/dateFormat";
 import type { EntryItem } from "#/api/api.types";
 import { Description } from "../Description";
 import { Link } from "@tanstack/react-router";
@@ -9,7 +9,10 @@ type EntryItemColumnProps = EntryItem & {
   onEdit: () => void;
 };
 
-export function EntryItemColumn({onEdit, ...entryProp}: EntryItemColumnProps ) {
+export function EntryItemColumn({
+  onEdit,
+  ...entryProp
+}: EntryItemColumnProps) {
   const {
     id,
     description,
@@ -27,16 +30,15 @@ export function EntryItemColumn({onEdit, ...entryProp}: EntryItemColumnProps ) {
     : "Now";
 
   return (
-    <tr className="border-b border-b-table-border ">
+    <tr>
       <td>
-        <Description text={description ?? "Not description"} />
+        <Description text={description ?? ""} />
       </td>
       <td id={`${project_id}`}>{project_name}</td>
 
       <td>
         <LabelList labels={labels ?? []} />
       </td>
-
       <td>{startDate}</td>
       <td>{endDate}</td>
       <td>{duration}</td>
