@@ -42,6 +42,7 @@ export function ProjectForm({
         create: createProject,
         update: updateProject,
         formData: formData,
+        initial: projectItem,
         onSuccess: async () => {
           await router.invalidate();
           onClose();

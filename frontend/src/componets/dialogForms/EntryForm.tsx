@@ -51,6 +51,10 @@ export function EntryForm({
         createSchema: CreateEntriesSchema,
         updateSchema: UpdateEntriesSchema,
         formData: formData,
+        initial: entryItem && {
+          ...entryItem,
+          label: entryItem.labels.map((l) => l.id),
+        },
       }),
     { error: null },
   );

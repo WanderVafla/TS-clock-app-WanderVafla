@@ -39,6 +39,7 @@ export function LabelForm({ labelItem, onClose }: CreateEditProjectFormProps) {
         create: createLabel,
         update: updateLabel,
         formData: formData,
+        initial: labelItem,
         onSuccess: async () => {
           await router.invalidate();
           onClose();
