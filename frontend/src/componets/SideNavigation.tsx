@@ -67,6 +67,7 @@ export function SideNavigation() {
 					className="p-2 rounded-2xl cursor-pointer [anchor-name:--clock-btn]"
 					type="button"
 					popoverTarget="popover"
+					aria-label="Open clock"
 					style={
 						isClockRunning ? { background: "gray" } : { background: "none" }
 					}
