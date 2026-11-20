@@ -5,5 +5,10 @@ export const API_URL = {
   labels: "/api/labels",
   project: "/api/projects",
   entries: (deps?: QueryParamsGetEntries) => `/api/entries${deps ? `?${new URLSearchParams(Object.entries(deps).filter(([, v]) => v !== undefined).map(([k, v]) => [k, String(v)]))}` : ""}`,
-  clock: "/api/clock",
+  clock: {
+    state: "/api/clock",
+    in: "/api/clock/in",
+    out: "/api/clock/out",
+    change: "/api/clock/change",
+  },
 }
