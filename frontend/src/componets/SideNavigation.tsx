@@ -182,11 +182,10 @@ function ClockPopover({
 			popover="auto"
 			aria-busy={isSubmitting}
 			onToggle={(e) => {
-				if (e.newState !== "open") return;
+				if (e.target !== e.currentTarget || e.newState !== "open") return;
 				setChoisedId(lastEntry?.project_id ?? 0);
 				setDescription(runningEntry?.description);
 				setSelectedLabelIds(currentLabelIds);
-				// An old error should not show up when the popover is opened again
 				setError(null);
 			}}
 			className="
