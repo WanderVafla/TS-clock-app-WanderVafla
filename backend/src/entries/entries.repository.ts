@@ -29,7 +29,7 @@ export const getEntries = async (
         where true
           ${id ? tx`and id = ${id}` : tx``}
           ${project_id ? tx`and project_id = ${project_id}` : tx``}
-          order by ${tx(order ?? standartOrder)}, id
+          order by (${tx(order ? `${order}` : `${standartOrder}`)}, id) DESC
           ${currentPage && sizePage ? tx`limit ${sizePage} offset ${(currentPage - 1) * sizePage}` : tx``}
       ;`;
 
