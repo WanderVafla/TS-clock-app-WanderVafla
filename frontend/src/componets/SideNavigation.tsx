@@ -14,6 +14,7 @@ import {
 	EntriesIcon,
 	LabelsIcon,
 	ProjectsIcon,
+	StatisticsIcon,
 	TimerStatusIcon,
 } from "./icons/NavIcons";
 import { NextPageIcon } from "./icons/PaginationIcons";
@@ -59,6 +60,17 @@ export function SideNavigation() {
 							<LabelsIcon />
 						</div>
 						<p className="text-xs md:text-xl">Labels</p>
+					</Link>
+				</div>
+				<div>
+					<Link
+						className="p-1 md:p-2 flex flex-col text-2xl items-center gap-1"
+						to="/"
+					>
+						<div>
+							<StatisticsIcon />
+						</div>
+						<p className="text-xs md:text-xl">Statistics</p>
 					</Link>
 				</div>
 			</nav>
