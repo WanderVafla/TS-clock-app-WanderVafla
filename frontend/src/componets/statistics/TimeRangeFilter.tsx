@@ -66,9 +66,18 @@ export function TimeRangeFilter({
     if (!nextError) onChange(next);
   };
 
+  const applyQuick = (id: QuickRange) => {
+    const range = rangeDates(id);
+    // Reset even when the range is already applied: the URL then does not change
+    setDraft(range);
+    setInputError(null);
+    onChange(range);
+  };
+
+  // Highlighted only when the inputs really show its dates
   const isQuick = (id: QuickRange) => {
     const r = rangeDates(id);
-    return r.from === value.from && r.to === value.to;
+    return !inputError && r.from === from && r.to === to;
   };
 
   return (
@@ -124,7 +133,7 @@ export function TimeRangeFilter({
             key={q.id}
             type="button"
             aria-pressed={isQuick(q.id)}
-            onClick={() => onChange(rangeDates(q.id))}
+            onClick={() => applyQuick(q.id)}
             className="
               h-11 cursor-pointer rounded-full border border-clock-border bg-popover px-3.5 text-sm text-clock-muted
               aria-pressed:border-clock-accent aria-pressed:bg-clock-selected
