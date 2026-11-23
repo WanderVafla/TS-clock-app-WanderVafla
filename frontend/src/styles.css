@@ -22,6 +22,12 @@
   --color-pagination-active: var(--color-primery);
   --color-popover: var(--color-white);
   --color-popover-shadow: rgb(0 0 0 / 0.25);
+
+  /* Clock popover */
+  --color-clock-accent: #2449c9;
+  --color-clock-selected: #e8edfb;
+  --color-clock-border: #c9ced8;
+  --color-clock-muted: #3f4654;
 }
 
 * {
