@@ -71,6 +71,76 @@ curl "http://localhost:8000/entries?page=2&sizePage=2"
 | `totalPages`     | `ceil(total / sizePage)`; without `sizePage`: `1`, or `0` if `total` is 0 |
 | `sorted`         | Column used for sorting                                                   |
 
+### `GET /statistics`
+
+Returns the tracked time in a time range: the total, and the time per project
+and per label. The Statistics page of the frontend uses it.
+
+#### Query parameters
+
+| Parameter | Type          | Default | Description                        |
+| --------- | ------------- | ------- | ---------------------------------- |
+| `from`    | ISO timestamp | -       | Start of the time range (included) |
+| `to`      | ISO timestamp | -       | End of the time range (excluded)   |
+
+- Only the part of an entry inside `[from, to)` counts. For example, an entry
+  from Friday 18:00 to Monday 08:00 adds 8 hours to the range "Monday".
+- Running entries (no `end_time`) are not counted.
+- An entry with several labels counts toward each of them, so the label
+  totals can be more than `totalMinutes`. An entry without a label is in
+  `totalMinutes` and in `projects`, but not in `labels`.
+- Without `from` or `to`, the range is open on that side; without both, it
+  covers all entries.
+- `to` not after `from`, or a value that is not an ISO timestamp, returns `422`.
+
+#### Response (example)
+
+```bash
+curl "http://localhost:8000/statistics?from=2026-11-15T23:00:00.000Z&to=2026-11-22T23:00:00.000Z"
+```
+
+```json
+{
+  "success": true,
+  "status": 200,
+  "data": {
+    "totalMinutes": 4573,
+    "entriesCount": 72,
+    "projects": [
+      { "id": 1, "name": "General", "minutes": 3823 },
+      { "id": 2, "name": "Work", "minutes": 750 }
+    ],
+    "labels": [
+      { "id": 1, "name": "Bug", "minutes": 53 },
+      { "id": 2, "name": "Feature", "minutes": 35 },
+      { "id": 3, "name": "Meeting", "minutes": 4 }
+    ]
+  }
+}
+```
+
+| `data` field   | Description                                                      |
+| -------------- | ---------------------------------------------------------------- |
+| `totalMinutes` | Tracked minutes in the range, rounded down                       |
+| `entriesCount` | Finished entries that overlap the range                          |
+| `projects`     | Minutes per project, biggest first; projects without time absent |
+| `labels`       | Minutes per label, biggest first; labels without time absent     |
+
+#### Optimisation choice
+
+The totals are computed by Postgres, in one request, with `SUM … GROUP BY`
+over the entries of the range. The range filter (`start_time < to`) uses the
+existing index `idx_time_entries_start_time_id (start_time, id)`. The three
+queries (total, projects, labels) run in one `repeatable read` transaction, so
+they read the same data.
+
+A materialized view was not chosen. The range is free (any `from` / `to`), so a
+view with precomputed totals could not cut entries at the range bounds. It
+would also need a refresh after every clock in, clock out and edit, or the
+page would show old numbers. Before this endpoint, the frontend downloaded
+every entry and its labels and added them up itself; this broke above 100
+entries, because `GET /entries/label` accepts at most 100 ids.
+
 ### Clock: `/clock`
 
 The clock keeps one timeline: at most one timer runs at a time, and entries
