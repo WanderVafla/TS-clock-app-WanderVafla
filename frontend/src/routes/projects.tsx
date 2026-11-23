@@ -9,6 +9,7 @@ import { ErrorDisplay } from "#/componets/placeholders/ErrorDisplay";
 import { Pending } from "#/componets/placeholders/Pending";
 import { ErrorMessageDisplay } from "#/componets/placeholders/ErrorMessageDisplay";
 import { NotFound } from "#/componets/placeholders/NotFound";
+import { PageHeader } from "#/componets/PageHeader";
 
 export const Route = createFileRoute("/projects")({
   loader: async () => {
@@ -21,20 +22,16 @@ export const Route = createFileRoute("/projects")({
 
 const columns: TableColumn[] = [
   {
-    title: "id",
-    width: 20,
-  },
-  {
     title: "Name",
-    width: 30,
+    width: 50,
   },
   {
     title: "Created",
-    width: 25,
+    width: 30,
   },
   {
     title: "Actions",
-    width: 25,
+    width: 20,
   },
 ] as const;
 
@@ -63,27 +60,36 @@ function RouteComponent() {
   ));
 
   return (
-    <main className="p-3 sm:p-4 md:p-10 min-h-dvh w-full min-w-0 flex flex-col gap-4 md:gap-8">
+    // Desktop: exactly one screen high, the card fills the free height. Phones: the page scrolls.
+    <main className="p-3 sm:p-4 md:px-6 md:pt-7 md:pb-5 w-full min-w-0 flex flex-col gap-5 md:h-dvh">
       <ErrorMessageDisplay error={error} />
-      <h1 className="font-medium text-5xl tracking-widest">Projects</h1>
-      <button
-        className="button-add"
-        type="button"
-        aria-label="Create project"
-        onClick={() => setDialogProject(null)}
-      >
-        Create Project
-      </button>
+      <PageHeader
+        title="Projects"
+        subtitle="Every time entry belongs to one project."
+        action={
+          <button
+            className="button-add"
+            type="button"
+            aria-label="Create project"
+            onClick={() => setDialogProject(null)}
+          >
+            + New project
+          </button>
+        }
+      />
       {dialogProject !== undefined && (
         <ProjectForm
           projectItem={dialogProject}
           onClose={() => setDialogProject(undefined)}
         />
       )}
-      <section className="flex flex-col w-full h-full overflow-x-auto overscroll-none rounded-2xl shadow-2xl">
+      <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[14px] border border-side-navigation-border bg-popover">
         <Table columns={columns} items={items} minWidth="20rem" />
         {items.length <= 0 ? <NotFound /> : ""}
       </section>
+      <p className="m-0 shrink-0 text-[13px] text-clock-muted">
+        Deleting a project also deletes its time entries.
+      </p>
     </main>
   );
 }

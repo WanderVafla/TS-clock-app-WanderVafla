@@ -12,14 +12,13 @@
 
   --color-border: var(--color-primery);
   --color-button: var(--color-primery);
-  --color-hover-sidebar: var(--color-hover);
-  --color-side-navigation: var(--color-primery);
-  --color-table-head: var(--color-primery);
-  --color-table-border: var(--color-gray-300);
+  --color-table-head: var(--color-clock-selected);
+  --color-table-head-text: var(--color-side-navigation-active-text);
+  --color-table-border: #eef0f3;
   --color-table-shadow: var(--color-gray-900);
-  --color-label: var(--color-gray-300);
-  --color-pagination-border: var(--color-primery);
-  --color-pagination-active: var(--color-primery);
+  --color-label: transparent;
+  --color-pagination-border: var(--color-clock-border);
+  --color-pagination-active: var(--color-clock-selected);
   --color-popover: var(--color-white);
   --color-popover-shadow: rgb(0 0 0 / 0.25);
 
@@ -28,6 +27,16 @@
   --color-clock-selected: #e8edfb;
   --color-clock-border: #c9ced8;
   --color-clock-muted: #3f4654;
+
+  /* Side navigation */
+  --color-side-navigation: var(--color-popover);
+  --color-side-navigation-border: #e1e4ea;
+  --color-side-navigation-text: var(--color-clock-muted);
+  --color-hover-sidebar: var(--color-clock-accent);
+  --color-side-navigation-active: var(--color-clock-selected);
+  --color-side-navigation-active-text: #1a3596;
+  /* Lifts the bottom bar on phones; none on the desktop column */
+  --shadow-side-navigation: 0 -4px 12px rgb(21 23 28 / 0.08);
 }
 
 * {
@@ -60,7 +69,7 @@ dialog:not([open]) {
   }
 
   .button-add {
-      @apply p-3 bg-button rounded-2xl self-end cursor-pointer;
+      @apply flex h-11 items-center gap-2 rounded-[10px] bg-clock-accent px-4.5 text-sm font-semibold text-white cursor-pointer;
   }
   tr {
       @apply border-b border-b-table-border;
@@ -92,6 +101,9 @@ dialog:not([open]) {
 
   .data-table th {
     padding-block: var(--head-y);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-table-head-text);
   }
 
   /* Same height for every body row, whatever the content of the page */
@@ -142,7 +154,7 @@ dialog:not([open]) {
 
   /* Pagination buttons; change --pagination-size to resize all of them */
   .pagination {
-    --pagination-size: 2rem;
+    --pagination-size: 2.5rem;
   }
 
   .pagination-button {
@@ -154,7 +166,9 @@ dialog:not([open]) {
     min-width: var(--pagination-size);
     padding-inline: 0.25rem;
     border: 1px solid var(--color-pagination-border);
-    border-radius: 0.75rem;
+    border-radius: 10px;
+    background: var(--color-popover);
+    color: var(--color-clock-muted);
   }
 
   .pagination-button[aria-disabled="true"] {

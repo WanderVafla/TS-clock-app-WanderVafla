@@ -9,6 +9,7 @@ import { LabelForm } from "#/componets/dialogForms/LabelForm";
 import { ErrorMessageDisplay } from "#/componets/placeholders/ErrorMessageDisplay";
 import type { Label } from "../../../backend/src/labels/labels.schema";
 import { NotFound } from "#/componets/placeholders/NotFound";
+import { PageHeader } from "#/componets/PageHeader";
 
 export const Route = createFileRoute("/labels")({
   loader: async () => {
@@ -21,21 +22,17 @@ export const Route = createFileRoute("/labels")({
 
 const columns: TableColumn[] = [
   {
-    title: "id",
-    width: 20,
-  },
-  {
     title: "Name",
-    width: 55,
+    width: 80,
   },
   {
     title: "Actions",
-    width: 25,
+    width: 20,
   },
 ] as const;
 
 function RouteComponent() {
-  const projects = Route.useLoaderData();
+  const labels = Route.useLoaderData();
 
   const [dialogLabel, setDialogLabel] = useState<Label | null | undefined>(
     undefined,
@@ -47,38 +44,47 @@ function RouteComponent() {
     setError(errorText);
   };
 
-  const items = projects.map((p) => (
+  const items = labels.map((l) => (
     <LabelItemColumn
-      key={p.id}
-      id={p.id}
-      name={p.name}
-      onEdit={() => setDialogLabel(p)}
+      key={l.id}
+      id={l.id}
+      name={l.name}
+      onEdit={() => setDialogLabel(l)}
       onError={handleError}
     />
   ));
 
   return (
-    <main className="p-3 sm:p-4 md:p-10 min-h-dvh w-full min-w-0 flex flex-col gap-4 md:gap-8">
+    // Desktop: exactly one screen high, the card fills the free height. Phones: the page scrolls.
+    <main className="p-3 sm:p-4 md:px-6 md:pt-7 md:pb-5 w-full min-w-0 flex flex-col gap-5 md:h-dvh">
       <ErrorMessageDisplay error={error} />
-      <h1 className="font-medium text-5xl tracking-widest">Labels</h1>
-      <button
-        className="button-add"
-        type="button"
-        aria-label="Create label"
-        onClick={() => setDialogLabel(null)}
-      >
-        Create Labels
-      </button>
+      <PageHeader
+        title="Labels"
+        subtitle="A time entry can have several labels."
+        action={
+          <button
+            className="button-add"
+            type="button"
+            aria-label="Create label"
+            onClick={() => setDialogLabel(null)}
+          >
+            + New label
+          </button>
+        }
+      />
       {dialogLabel !== undefined && (
         <LabelForm
           labelItem={dialogLabel}
           onClose={() => setDialogLabel(undefined)}
         />
       )}
-      <section className="flex flex-col w-full h-full overflow-x-auto overscroll-none rounded-2xl shadow-2xl">
+      <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[14px] border border-side-navigation-border bg-popover">
         <Table columns={columns} items={items} minWidth="20rem" />
         {items.length <= 0 ? <NotFound /> : ""}
       </section>
+      <p className="m-0 shrink-0 text-[13px] text-clock-muted">
+        Deleting a label removes it from its entries; the entries stay.
+      </p>
     </main>
   );
 }

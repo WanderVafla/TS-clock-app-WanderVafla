@@ -5,6 +5,7 @@ import { ErrorMessageDisplay } from "#/componets/placeholders/ErrorMessageDispla
 import { getMessageError } from "#/shared/getMessageError";
 import { shallowDiff } from "#/shared/shallowDiff";
 import type { ClockChange } from "../../../backend/src/clock/clock.schema";
+import { NamesLength } from "../../../backend/src/share/constants";
 import type { Entries } from "../../../backend/src/entries/entries.schema";
 import type { EntryLabelLink } from "../../../backend/src/entries_labels/entries_labels.schema";
 import type { Label } from "../../../backend/src/labels/labels.schema";
@@ -14,6 +15,7 @@ import {
 	EntriesIcon,
 	LabelsIcon,
 	ProjectsIcon,
+	StatisticsIcon,
 	TimerStatusIcon,
 } from "./icons/NavIcons";
 import { NextPageIcon } from "./icons/PaginationIcons";
@@ -21,60 +23,66 @@ import { LabelPicker } from "./LabelPicker";
 import { NotFound } from "./placeholders/NotFound";
 
 const rootRoute = getRouteApi("__root__");
+
+const navItems = [
+	{ to: "/entries", label: "Planing", Icon: EntriesIcon },
+	{ to: "/projects", label: "Projects", Icon: ProjectsIcon },
+	{ to: "/labels", label: "Labels", Icon: LabelsIcon },
+	{ to: "/", label: "Statistics", Icon: StatisticsIcon },
+] as const;
+
+/*
+ * Page links on top, clock button at the bottom (desktop: left column).
+ * On phones it becomes a bar at the bottom of the screen, links left, clock right.
+ */
 export function SideNavigation() {
 	const { isClockRunning, projects, labels, lastEntries, entriesLabels } =
 		rootRoute.useLoaderData();
 
 	return (
-		<aside className="order-last md:order-0 sticky bottom-2 z-10 m-2 p-[0.25rem_1rem] md:p-[1rem_0.50rem] rounded-2xl md:max-h-dvh flex flex-row md:flex-col items-center md:items-stretch justify-between bg-side-navigation shadow-[0_-6px_8px_-4px_rgba(0,0,0,0.6)] md:shadow-[6px_0_8px_-4px_rgba(0,0,0,0.6)]">
-			<nav className="[&_div:hover_svg]:text-hover-sidebar [&_div:hover_p]:text-hover-sidebar flex flex-row md:flex-col gap-2">
-				<div>
+		<aside
+			className="
+        order-last md:order-0 sticky bottom-2 md:top-3 md:bottom-auto z-10 m-2 md:m-3 [anchor-name:--side-nav]
+        md:h-[calc(100dvh-1.5rem)] md:self-start
+        flex flex-row md:flex-col items-center justify-between gap-2
+        rounded-2xl border border-side-navigation-border bg-side-navigation p-1.5 md:px-2 md:py-4
+        shadow-side-navigation md:shadow-none
+        "
+		>
+			<nav
+				aria-label="Main"
+				className="flex min-w-0 flex-1 flex-row md:flex-none md:flex-col gap-0.5 md:gap-2"
+			>
+				{navItems.map(({ to, label, Icon }) => (
 					<Link
-						className="p-1 md:p-2 flex flex-col text-2xl items-center gap-1"
-						to="/entries"
+						key={to}
+						to={to}
+						// "/" would match every page without exact
+						activeOptions={{ exact: true }}
+						className="
+              flex min-h-14 min-w-0 max-w-16 flex-1 md:min-h-16 md:max-w-none md:w-20 md:flex-none flex-col items-center justify-center gap-1
+              rounded-xl text-[22px] text-side-navigation-text hover:text-hover-sidebar
+              data-[status=active]:bg-side-navigation-active
+              data-[status=active]:font-semibold data-[status=active]:text-side-navigation-active-text
+              "
 					>
-						<div>
-							<EntriesIcon />
-						</div>
-						<p className="text-xs md:text-xl">Planing</p>
+						<Icon />
+						<span className="text-[11px] md:text-[13px]">{label}</span>
 					</Link>
-				</div>
-				<div>
-					<Link
-						className="p-1 md:p-2 flex flex-col text-2xl items-center gap-1"
-						to="/projects"
-					>
-						<div>
-							<ProjectsIcon />
-						</div>
-						<p className="text-xs md:text-xl">Projects</p>
-					</Link>
-				</div>
-				<div>
-					<Link
-						className="p-1 md:p-2 flex flex-col text-2xl items-center gap-1"
-						to="/labels"
-					>
-						<div>
-							<LabelsIcon />
-						</div>
-						<p className="text-xs md:text-xl">Labels</p>
-					</Link>
-				</div>
+				))}
 			</nav>
-			<div className="[&_button:hover_svg]:size-5 [&_button:hover_svg]:text-hover-sidebar hover_p:text-hover-sidebar p-2 flex flex-col items-center">
-				<button
-					className="p-2 rounded-2xl cursor-pointer [anchor-name:--clock-btn]"
-					type="button"
-					popoverTarget="popover"
-					aria-label="Open clock"
-					style={
-						isClockRunning ? { background: "gray" } : { background: "none" }
-					}
-				>
-					<TimerStatusIcon />
-				</button>
-			</div>
+			<button
+				className={`
+          grid size-11 shrink-0 cursor-pointer place-items-center rounded-full text-[22px]
+          hover:text-hover-sidebar [anchor-name:--clock-btn]
+          ${isClockRunning ? "bg-side-navigation-active text-side-navigation-active-text" : "text-side-navigation-text"}
+          `}
+				type="button"
+				popoverTarget="popover"
+				aria-label={isClockRunning ? "Open clock (running)" : "Open clock"}
+			>
+				<TimerStatusIcon />
+			</button>
 			<ClockPopover
 				clockStatus={isClockRunning}
 				projects={projects}
@@ -177,6 +185,7 @@ function ClockPopover({
 		});
 
 	return (
+		// Phones: full width above the bottom bar. Desktop: next to the clock button.
 		<section
 			ref={popoverRef}
 			id="popover"
@@ -193,10 +202,12 @@ function ClockPopover({
         [position-anchor:--clock-btn]
         [anchor-name:--clock-popover]
         inset-auto m-0
-        left-[calc(anchor(right)+12px)]
-        bottom-[anchor(bottom)]
-        [position-try-fallbacks:flip-block,flip-inline]
-        w-90 max-w-full p-4.5
+        left-2 right-2 bottom-[calc(anchor(--side-nav_top)+8px)]
+        max-h-[calc(100dvh-6rem)] overflow-y-auto
+        md:right-auto md:left-[calc(anchor(--side-nav_right)+12px)] md:bottom-[anchor(bottom)]
+        md:max-h-none md:overflow-visible
+        md:[position-try-fallbacks:flip-block,flip-inline]
+        md:w-90 max-w-full p-4.5
         flex-col gap-3.5 [&:popover-open]:flex
         rounded-[14px] border border-clock-border bg-popover
         shadow-[0_12px_32px_rgba(21,23,28,0.14)]
@@ -293,6 +304,7 @@ function ClockPopover({
 
 				<textarea
 					placeholder="Description"
+					maxLength={NamesLength.max}
 					className="m-0 rounded-lg bg-gray-50 px-3 py-2.5 text-[13px] text-clock-muted resize-none"
 					value={description ?? ""}
 					onChange={(e) => setDescription(e.target.value)}

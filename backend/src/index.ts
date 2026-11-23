@@ -12,6 +12,7 @@ import { entriesRoute } from "./entries/entries.route";
 import { ErrorMessage, ErrorName, ValidationError } from "./share/constants";
 import { clockRoute } from "./clock/clock.route";
 import { entriesLabelsRoute } from "./entries_labels/entries_labels.route";
+import { statisticsRoute } from "./statistics/statistics.route";
 
 const app = new Elysia()
   .error({
@@ -118,6 +119,7 @@ const app = new Elysia()
   .use(entriesRoute)
   .use(entriesLabelsRoute)
   .use(clockRoute)
+  .use(statisticsRoute)
   .listen({
     port: 8000,
     hostname: "0.0.0.0",

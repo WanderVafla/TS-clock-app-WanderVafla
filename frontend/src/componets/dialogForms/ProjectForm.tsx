@@ -12,6 +12,7 @@ import type { ActionState } from "#/shared/types";
 import { TitleMessage } from "#/contants/messages";
 import { ErrorMessageDisplay } from "#/componets/placeholders/ErrorMessageDisplay";
 import { saveFormAction } from "#/shared/saveAction";
+import { NamesLength } from "../../../../backend/src/share/constants";
 
 type CreateEditProjectFormProps = { projectItem: Project | null } & {
   onClose: () => void;
@@ -75,6 +76,8 @@ export function ProjectForm({
           className="input-form"
           name="name"
           type="text"
+          // Same limit as the database and the backend schema
+          maxLength={NamesLength.max}
           defaultValue={projectItem?.name}
         />
         <div className="flex gap-5 self-end [&_button:hover]:cursor-pointer">

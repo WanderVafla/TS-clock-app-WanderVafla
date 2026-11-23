@@ -35,13 +35,21 @@ hour_floor() {
 if [[ -n "${START:-}" ]]; then
   first=$(date -u -d "$START" +%s)
 else
-  # GET /entries sorts by start_time ascending, so the first entry is the earliest.
+  # GET /entries sorts by start_time descending (newest first), so with one
+  # entry per page the earliest entry is on the last page, page number = total.
   first_page=$(curl -sf "$URL?sizePage=1") || {
     echo "cannot read entries from $URL"
     exit 1
   }
-  # An empty table has no start_time; grep then fails, which is not an error here.
-  earliest=$(grep -o '"start_time":"[^"]*"' <<<"$first_page" | head -1 | cut -d'"' -f4 || true)
+  total=$(grep -o '"total":[0-9]*' <<<"$first_page" | cut -d: -f2)
+  earliest=""
+  if [[ "${total:-0}" -gt 0 ]]; then
+    last_page=$(curl -sf "$URL?sizePage=1&page=$total") || {
+      echo "cannot read entries from $URL"
+      exit 1
+    }
+    earliest=$(grep -o '"start_time":"[^"]*"' <<<"$last_page" | head -1 | cut -d'"' -f4)
+  fi
   if [[ -n "$earliest" ]]; then
     anchor=$(hour_floor "$(date -u -d "$earliest" +%s)")
   else

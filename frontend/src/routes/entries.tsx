@@ -5,7 +5,7 @@ import { fetchEntries } from "#/api/api.entries.ts";
 import { EntriesSearchSchema, type EntryItem } from "#/api/api.types.ts";
 import type { Metadata } from "../../../backend/src/share/schema.ts";
 import type { Label } from "../../../backend/src/labels/labels.schema.ts";
-import { PendingConf } from "#/contants/config.ts";
+import { PaginationConf, PendingConf } from "#/contants/config.ts";
 import { Pagination } from "#/componets/Pagination.tsx";
 import { Table, type TableColumn } from "#/componets/Table.tsx";
 import { EntryItemColumn } from "#/componets/columnItems/EntryItemColumn.tsx";
@@ -17,6 +17,8 @@ import type { Project } from "../../../backend/src/projects/projects.schema.ts";
 import { EntryForm } from "#/componets/dialogForms/EntryForm.tsx";
 import { useState } from "react";
 import { NotFound } from "#/componets/placeholders/NotFound.tsx";
+import { PageHeader } from "#/componets/PageHeader.tsx";
+import { type DayRange, toTimestampRange } from "#/shared/toTimestampRange.ts";
 
 type LoaderResponse = {
   data: (Entries & { project_name: string } & { labels: Label[] })[];
@@ -25,13 +27,17 @@ type LoaderResponse = {
   labels: Label[];
 };
 
-const loadData = async (deps: {
+const loadData = async ({
+  page,
+  sizePage,
+  ...days
+}: {
   page: number;
   sizePage: number;
-}): Promise<LoaderResponse> => {
+} & DayRange): Promise<LoaderResponse> => {
   const [projects, entries, labels] = await Promise.all([
     fetchProjects(),
-    fetchEntries(deps),
+    fetchEntries({ page, sizePage, ...toTimestampRange(days) }),
     fetchLabels(),
   ]);
 
@@ -65,7 +71,14 @@ const loadData = async (deps: {
 export const Route = createFileRoute("/entries")({
   component: RouteComponent,
   validateSearch: EntriesSearchSchema,
-  loaderDeps: ({ search: { page, sizePage } }) => ({ page, sizePage }),
+  loaderDeps: ({
+    search: {
+      page = PaginationConf.defalutPage,
+      sizePage = PaginationConf.defaultSizePage,
+      from,
+      to,
+    },
+  }) => ({ page, sizePage, from, to }),
   loader: async ({ deps }): Promise<LoaderResponse> => loadData(deps),
   pendingComponent: Pending,
   errorComponent: ErrorDisplay,
@@ -130,19 +143,22 @@ function RouteComponent() {
   });
 
   return (
-    <main className="p-3 sm:p-4 md:p-10 min-h-dvh w-full min-w-0 flex flex-col gap-4 md:gap-8">
-      <header className="self-start">
-        <h1 className="font-medium text-5xl tracking-widest">Planing</h1>
-      </header>
-
-      <button
-        className="button-add"
-        onClick={() => setDialogEntry(null)}
-        aria-label="Create entry"
-        type="button"
-      >
-        Add Entry
-      </button>
+    // Desktop: exactly one screen high, only the table scrolls. Phones: the page scrolls.
+    <main className="p-3 sm:p-4 md:px-6 md:pt-7 md:pb-5 w-full min-w-0 flex flex-col gap-5 md:h-dvh">
+      <PageHeader
+        title="Planing"
+        subtitle={`${metadata.total} entries`}
+        action={
+          <button
+            className="button-add"
+            onClick={() => setDialogEntry(null)}
+            aria-label="Create entry"
+            type="button"
+          >
+            + Add entry
+          </button>
+        }
+      />
 
       {/* Rendered only while open, so every opening starts with a fresh form and no stale error */}
       {dialogEntry !== undefined && (
@@ -154,15 +170,18 @@ function RouteComponent() {
         />
       )}
 
-      <section className="flex flex-col w-full h-full overflow-x-auto overscroll-none rounded-2xl shadow-2xl">
+      {/* Takes all the free height between the header and the pagination */}
+      <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[14px] border border-side-navigation-border bg-popover">
         <Table columns={columns} items={items} />
 
         {/*placehoder if there is not entries */}
         {items.length <= 0 ? <NotFound /> : ""}
       </section>
 
-      {/* Pagination button */}
-      <nav>{<Pagination metadata={metadata} search={search} />}</nav>
+      {/* Never shrinks, so it always stays on screen */}
+      <nav aria-label="Pagination" className="shrink-0">
+        <Pagination metadata={metadata} search={search} />
+      </nav>
     </main>
   );
 }

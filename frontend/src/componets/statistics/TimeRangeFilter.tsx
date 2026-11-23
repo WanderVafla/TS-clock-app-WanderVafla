@@ -1,0 +1,153 @@
+import { useState } from "react";
+import { ErrorMessageDisplay } from "#/componets/placeholders/ErrorMessageDisplay";
+import { dayRangeError } from "#/shared/dayRangeError";
+import type { DayRange } from "#/shared/toTimestampRange";
+
+type QuickRange = "today" | "week" | "month" | "last30";
+
+const quickRanges: { id: QuickRange; label: string }[] = [
+  { id: "week", label: "This week" },
+  { id: "month", label: "This month" },
+  { id: "last30", label: "Last 30 days" },
+];
+
+// Local date as YYYY-MM-DD, the value format of <input type="date">
+const toInputDate = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+export function rangeDates(range: QuickRange, now = new Date()): DayRange {
+  const from = new Date(now);
+  if (range === "week") {
+    // Weeks start on Monday
+    from.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+  } else if (range === "month") {
+    from.setDate(1);
+  } else if (range === "last30") {
+    from.setDate(now.getDate() - 29);
+  }
+  return { from: toInputDate(from), to: toInputDate(now) };
+}
+
+/*
+ * From / To days with quick ranges. Controlled: the range lives in the URL
+ * search params, the parent passes it in and saves the new one on change.
+ * A quick range is highlighted while the dates match it.
+ * An invalid range is not saved: the inputs keep it and the error shows below them.
+ */
+export function TimeRangeFilter({
+  value,
+  onChange,
+  error,
+}: {
+  value: DayRange;
+  onChange: (range: DayRange) => void;
+  // Error found by the page, e.g. invalid dates in the URL
+  error?: string | null;
+}) {
+  // Dates shown in the inputs; differs from `value` while the typed range is invalid
+  const [draft, setDraft] = useState<DayRange>(value);
+  const [inputError, setInputError] = useState<string | null>(null);
+
+  // A new value from the URL (quick range, back button) replaces the draft
+  const [prevValue, setPrevValue] = useState<DayRange>(value);
+  if (prevValue.from !== value.from || prevValue.to !== value.to) {
+    setPrevValue(value);
+    setDraft(value);
+    setInputError(null);
+  }
+
+  const { from, to } = draft;
+  const shownError = inputError ?? error ?? null;
+
+  const changeDates = (next: DayRange) => {
+    setDraft(next);
+    const nextError = dayRangeError(next);
+    setInputError(nextError);
+    if (!nextError) onChange(next);
+  };
+
+  const applyQuick = (id: QuickRange) => {
+    const range = rangeDates(id);
+    // Reset even when the range is already applied: the URL then does not change
+    setDraft(range);
+    setInputError(null);
+    onChange(range);
+  };
+
+  // Highlighted only when the inputs really show its dates
+  const isQuick = (id: QuickRange) => {
+    const r = rangeDates(id);
+    return !inputError && r.from === from && r.to === to;
+  };
+
+  return (
+    <form
+      aria-label="Time range"
+      className="flex flex-wrap items-end gap-4 rounded-[14px] border border-clock-border bg-popover p-4.5"
+      onSubmit={(e) => e.preventDefault()}
+    >
+      <div className="flex flex-[0_1_190px] flex-col gap-1.5">
+        <label
+          htmlFor="range-from"
+          className="text-[13px] font-medium text-clock-muted"
+        >
+          From
+        </label>
+        <input
+          id="range-from"
+          type="date"
+          value={from ?? ""}
+          max={to}
+          aria-invalid={shownError !== null}
+          aria-describedby="range-error"
+          onChange={(e) =>
+            changeDates({ from: e.target.value || undefined, to })
+          }
+          className="h-11 rounded-[10px] border border-clock-border px-3"
+        />
+      </div>
+      <div className="flex flex-[0_1_190px] flex-col gap-1.5">
+        <label
+          htmlFor="range-to"
+          className="text-[13px] font-medium text-clock-muted"
+        >
+          To
+        </label>
+        <input
+          id="range-to"
+          type="date"
+          value={to ?? ""}
+          min={from}
+          aria-invalid={shownError !== null}
+          aria-describedby="range-error"
+          onChange={(e) =>
+            changeDates({ from, to: e.target.value || undefined })
+          }
+          className="h-11 rounded-[10px] border border-clock-border px-3"
+        />
+      </div>
+      <fieldset className="flex flex-wrap gap-1.5">
+        <legend className="sr-only">Quick ranges</legend>
+        {quickRanges.map((q) => (
+          <button
+            key={q.id}
+            type="button"
+            aria-pressed={isQuick(q.id)}
+            onClick={() => applyQuick(q.id)}
+            className="
+              h-11 cursor-pointer rounded-full border border-clock-border bg-popover px-3.5 text-sm text-clock-muted
+              aria-pressed:border-clock-accent aria-pressed:bg-clock-selected
+              aria-pressed:font-semibold aria-pressed:text-clock-accent
+              "
+          >
+            {q.label}
+          </button>
+        ))}
+      </fieldset>
+      {/* Own line under the inputs; the range is not applied while it shows */}
+      <div id="range-error" className="basis-full empty:hidden">
+        <ErrorMessageDisplay error={shownError} />
+      </div>
+    </form>
+  );
+}

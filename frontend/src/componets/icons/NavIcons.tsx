@@ -38,6 +38,18 @@ export function ProjectsIcon() {
   );
 }
 
+// Bar chart: the statistics page (/)
+export function StatisticsIcon() {
+  return (
+    <Icon>
+      <path d="M4 20V10" />
+      <path d="M10 20V4" />
+      <path d="M16 20v-7" />
+      <path d="M22 20H2" />
+    </Icon>
+  );
+}
+
 // Tag: the list of labels (/labels)
 export function LabelsIcon() {
   return (
