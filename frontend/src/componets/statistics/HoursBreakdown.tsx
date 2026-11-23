@@ -24,8 +24,12 @@ export function HoursBreakdown({
 				return (
 					<div key={row.id} className="flex flex-col gap-2">
 						<div className="flex justify-between gap-3 text-[15px]">
-							<span className="font-medium">{row.name}</span>
-							<span>
+							{/* Long names are cut with "…"; the full name shows on hover */}
+							<span className="min-w-0 truncate font-medium" title={row.name}>
+								{row.name}
+							</span>
+							{/* Never shrinks, so the duration always stays inside the card */}
+							<span className="shrink-0 whitespace-nowrap">
 								<span className="font-mono">{formatDuration(row.minutes)}</span>
 								{showShare && (
 									<span className="text-clock-muted"> · {share}%</span>

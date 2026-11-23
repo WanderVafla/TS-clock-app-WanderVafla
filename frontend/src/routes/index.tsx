@@ -64,10 +64,11 @@ function Home() {
         <StatCard title="Entries" value={String(stats.entriesCount)} />
         <StatCard
           title="Top project"
-          value={
+          value={topProject ? topProject.name : "—"}
+          suffix={
             topProject
-              ? `${topProject.name} · ${percentOf(topProject.minutes, stats.totalMinutes)}%`
-              : "—"
+              ? ` · ${percentOf(topProject.minutes, stats.totalMinutes)}%`
+              : undefined
           }
           mono={false}
         />

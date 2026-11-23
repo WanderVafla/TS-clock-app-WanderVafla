@@ -13,6 +13,7 @@ import { TitleMessage } from "#/contants/messages.ts";
 import { ErrorMessageDisplay } from "#/componets/placeholders/ErrorMessageDisplay.tsx";
 import { NotFound } from "../placeholders/NotFound.tsx";
 import { IsoDateTimeInput } from "#/componets/inputs/IsoDateTimeInput.tsx";
+import { NamesLength } from "../../../../backend/src/share/constants.ts";
 import { saveFormAction } from "#/shared/saveAction.ts";
 
 const nameData = "entry" as const;
@@ -78,7 +79,7 @@ export function EntryForm({
         <input name="id" type="hidden" value={entryItem?.id} />
         <textarea
           className="input-form h-30 resize-none"
-          maxLength={255}
+          maxLength={NamesLength.max}
           name="description"
           placeholder="Description"
           defaultValue={entryItem?.description ?? ""}

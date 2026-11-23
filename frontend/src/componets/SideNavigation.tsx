@@ -5,6 +5,7 @@ import { ErrorMessageDisplay } from "#/componets/placeholders/ErrorMessageDispla
 import { getMessageError } from "#/shared/getMessageError";
 import { shallowDiff } from "#/shared/shallowDiff";
 import type { ClockChange } from "../../../backend/src/clock/clock.schema";
+import { NamesLength } from "../../../backend/src/share/constants";
 import type { Entries } from "../../../backend/src/entries/entries.schema";
 import type { EntryLabelLink } from "../../../backend/src/entries_labels/entries_labels.schema";
 import type { Label } from "../../../backend/src/labels/labels.schema";
@@ -303,6 +304,7 @@ function ClockPopover({
 
 				<textarea
 					placeholder="Description"
+					maxLength={NamesLength.max}
 					className="m-0 rounded-lg bg-gray-50 px-3 py-2.5 text-[13px] text-clock-muted resize-none"
 					value={description ?? ""}
 					onChange={(e) => setDescription(e.target.value)}
