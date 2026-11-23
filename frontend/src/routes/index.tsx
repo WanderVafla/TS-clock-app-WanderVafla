@@ -13,15 +13,18 @@ import { fetchStatistics } from "#/api/api.statistics";
 import { Pending } from "#/componets/placeholders/Pending";
 import { ErrorDisplay } from "#/componets/placeholders/ErrorDisplay";
 import { PendingConf } from "#/contants/config";
-import { EntriesSearchSchema } from "#/api/api.types";
+import { StatisticsSearchSchema } from "#/api/api.types";
 import { type DayRange, toTimestampRange } from "#/shared/toTimestampRange";
+import { dayRangeError } from "#/shared/dayRangeError";
 
-// Without from/to in the URL, the page shows the current month
+// Without from/to in the URL, or with invalid ones, the page shows the current month
 const withDefaultRange = ({ from, to }: DayRange): DayRange =>
-  from || to ? { from, to } : rangeDates("month");
+  (from || to) && !dayRangeError({ from, to })
+    ? { from, to }
+    : rangeDates("month");
 
 export const Route = createFileRoute("/")({
-  validateSearch: EntriesSearchSchema,
+  validateSearch: StatisticsSearchSchema,
   loaderDeps: ({ search }) => withDefaultRange(search),
   // The backend sums the time in SQL; the page only displays the totals
   loader: ({ deps }) => fetchStatistics(toTimestampRange(deps)),
@@ -46,6 +49,8 @@ function Home() {
 
       <TimeRangeFilter
         value={withDefaultRange(search)}
+        // Invalid dates in the URL: the page shows the current month and says why
+        error={dayRangeError(search)}
         onChange={(range) =>
           navigate({ search: (prev) => ({ ...prev, ...range }) })
         }

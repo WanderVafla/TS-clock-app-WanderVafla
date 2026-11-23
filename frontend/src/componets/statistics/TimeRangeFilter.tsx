@@ -1,3 +1,6 @@
+import { useState } from "react";
+import { ErrorMessageDisplay } from "#/componets/placeholders/ErrorMessageDisplay";
+import { dayRangeError } from "#/shared/dayRangeError";
 import type { DayRange } from "#/shared/toTimestampRange";
 
 type QuickRange = "today" | "week" | "month" | "last30";
@@ -29,18 +32,43 @@ export function rangeDates(range: QuickRange, now = new Date()): DayRange {
  * From / To days with quick ranges. Controlled: the range lives in the URL
  * search params, the parent passes it in and saves the new one on change.
  * A quick range is highlighted while the dates match it.
+ * An invalid range is not saved: the inputs keep it and the error shows below them.
  */
 export function TimeRangeFilter({
   value,
   onChange,
+  error,
 }: {
   value: DayRange;
   onChange: (range: DayRange) => void;
+  // Error found by the page, e.g. invalid dates in the URL
+  error?: string | null;
 }) {
-  const { from, to } = value;
+  // Dates shown in the inputs; differs from `value` while the typed range is invalid
+  const [draft, setDraft] = useState<DayRange>(value);
+  const [inputError, setInputError] = useState<string | null>(null);
+
+  // A new value from the URL (quick range, back button) replaces the draft
+  const [prevValue, setPrevValue] = useState<DayRange>(value);
+  if (prevValue.from !== value.from || prevValue.to !== value.to) {
+    setPrevValue(value);
+    setDraft(value);
+    setInputError(null);
+  }
+
+  const { from, to } = draft;
+  const shownError = inputError ?? error ?? null;
+
+  const changeDates = (next: DayRange) => {
+    setDraft(next);
+    const nextError = dayRangeError(next);
+    setInputError(nextError);
+    if (!nextError) onChange(next);
+  };
+
   const isQuick = (id: QuickRange) => {
     const r = rangeDates(id);
-    return r.from === from && r.to === to;
+    return r.from === value.from && r.to === value.to;
   };
 
   return (
@@ -61,7 +89,11 @@ export function TimeRangeFilter({
           type="date"
           value={from ?? ""}
           max={to}
-          onChange={(e) => onChange({ from: e.target.value || undefined, to })}
+          aria-invalid={shownError !== null}
+          aria-describedby="range-error"
+          onChange={(e) =>
+            changeDates({ from: e.target.value || undefined, to })
+          }
           className="h-11 rounded-[10px] border border-clock-border px-3"
         />
       </div>
@@ -77,7 +109,11 @@ export function TimeRangeFilter({
           type="date"
           value={to ?? ""}
           min={from}
-          onChange={(e) => onChange({ from, to: e.target.value || undefined })}
+          aria-invalid={shownError !== null}
+          aria-describedby="range-error"
+          onChange={(e) =>
+            changeDates({ from, to: e.target.value || undefined })
+          }
           className="h-11 rounded-[10px] border border-clock-border px-3"
         />
       </div>
@@ -99,6 +135,10 @@ export function TimeRangeFilter({
           </button>
         ))}
       </fieldset>
+      {/* Own line under the inputs; the range is not applied while it shows */}
+      <div id="range-error" className="basis-full empty:hidden">
+        <ErrorMessageDisplay error={shownError} />
+      </div>
     </form>
   );
 }

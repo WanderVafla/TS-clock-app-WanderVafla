@@ -19,3 +19,9 @@ export const EntriesSearchSchema = v.object({
 });
 
 export type EntriesSearch = v.InferOutput<typeof EntriesSearchSchema>;
+
+// Statistics page: any string is kept, dayRangeError checks the dates and the page shows the error beside the filter
+export const StatisticsSearchSchema = v.object({
+  from: v.optional(v.string()),
+  to: v.optional(v.string()),
+});
