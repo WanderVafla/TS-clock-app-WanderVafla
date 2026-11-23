@@ -19,25 +19,30 @@ const table_name = DatabaseTableNames.entries;
 export const getEntries = async (
   params?: QueryParamsGetEntries,
 ): Promise<[Entries[], Metadata]> => {
-  const { id, project_id, page, sizePage, order } = params || {};
+  const { id, project_id, page, sizePage, order, from, to } = params || {};
 
   const standartOrder = "start_time" as const;
   const currentPage = page ?? 1;
 
   return pg.begin("isolation level repeatable read", async (tx) => {
+    // Same filters for the page and for the total, so the pagination matches the rows
+    const filters = () => tx`
+      where true
+        ${id ? tx`and id = ${id}` : tx``}
+        ${project_id ? tx`and project_id = ${project_id}` : tx``}
+        ${to ? tx`and start_time < ${to}` : tx``}
+        ${from ? tx`and (end_time is null or end_time > ${from})` : tx``}
+    `;
+
     const query: Entries[] = await tx`select * from ${tx(table_name)}
-        where true
-          ${id ? tx`and id = ${id}` : tx``}
-          ${project_id ? tx`and project_id = ${project_id}` : tx``}
+          ${filters()}
           order by (${tx(order ? `${order}` : `${standartOrder}`)}, id) DESC
           ${currentPage && sizePage ? tx`limit ${sizePage} offset ${(currentPage - 1) * sizePage}` : tx``}
       ;`;
 
     const [{ total }] = await tx`
     select count(*)::int as total from ${tx(table_name)}
-    where true
-      ${id ? tx`and id = ${id}` : tx``}
-      ${project_id ? tx`and project_id = ${project_id}` : tx``}
+    ${filters()}
     ;
     `;
 

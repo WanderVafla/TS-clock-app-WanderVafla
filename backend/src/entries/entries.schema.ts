@@ -19,7 +19,26 @@ const UpdateDataColumns = [
   "project_id",
 ] as const;
 
-const isEndNotBeforeStart = ({ start_time, end_time }: TimeRange) =>
+const isoTimestampSchema = v.pipe(
+  v.string(),
+  v.isoTimestamp(ValidationError.DateNotCorrect),
+);
+
+/* Optional [from, to) range, shared by the entries list and the statistics */
+export const timeRangeEntries = {
+  from: v.optional(isoTimestampSchema),
+  to: v.optional(isoTimestampSchema),
+};
+
+export const isToAfterFrom = ({
+  from,
+  to,
+}: {
+  from?: string;
+  to?: string;
+}): boolean => from == null || to == null || new Date(to) > new Date(from);
+
+const isEndNotBeforeStart =({ start_time, end_time }: TimeRange) =>
   start_time == null ||
   end_time == null ||
   new Date(end_time) > new Date(start_time);
@@ -38,8 +57,6 @@ export const EntriesBase = v.object({
   description: v.nullish(emptyToNull(stringSchema)),
   project_id: idQuerySchema,
 });
-
-
 
 export const labelIdSchema = v.array(idQuerySchema);
 
@@ -104,6 +121,8 @@ export const QueryParamsGetEntriesSchema = v.pipe(
   v.object({
     id: v.optional(idQuerySchema),
     project_id: v.optional(idQuerySchema),
+    // Time range: keeps the entries that overlap [from, to), running ones included
+    ...timeRangeEntries,
     ...paginationParamsSchema.entries,
     order: v.optional(v.pipe(stringSchema, v.keyof(EntriesBase))),
   }),
@@ -114,6 +133,14 @@ export const QueryParamsGetEntriesSchema = v.pipe(
       ValidationError.HaveRequireFields(["sizePage"]),
     ),
     ["page"],
+  ),
+  v.forward(
+    v.partialCheck(
+      [["from"], ["to"]],
+      isToAfterFrom,
+      ValidationError.ValueIsLessThatValue("to", "from", "less"),
+    ),
+    ["to"],
   ),
 );
 

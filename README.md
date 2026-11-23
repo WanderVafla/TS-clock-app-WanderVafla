@@ -32,7 +32,13 @@ entries; with `sizePage` it returns a single page.
 | `page`       | integer | `1`          | Page number, starts at 1. Requires `sizePage`                      |
 | `sizePage`   | integer | -            | Entries per page, from 1 to 100. Enables pagination                |
 | `order`      | string  | `start_time` | Sort column: `id`, `start_time`, `end_time`, `description`, `project_id` |
+| `from`       | ISO timestamp | -      | Start of the time range (included)                                 |
+| `to`         | ISO timestamp | -      | End of the time range (excluded)                                   |
 
+- With `from` / `to`, the response keeps every entry that overlaps
+  `[from, to)`: it starts before `to` and ends after `from`. A running entry
+  (no `end_time`) counts as still going. Either bound can be left out.
+- `to` not after `from`, or a value that is not an ISO timestamp, returns `422`.
 - Sorting is always ascending. Entries with the same value in the sort column
   are ordered by `id`, so pages stay stable between requests.
 - `page` without `sizePage`, `sizePage` above 100, a value below 1 or an
