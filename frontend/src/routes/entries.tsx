@@ -5,7 +5,7 @@ import { fetchEntries } from "#/api/api.entries.ts";
 import { EntriesSearchSchema, type EntryItem } from "#/api/api.types.ts";
 import type { Metadata } from "../../../backend/src/share/schema.ts";
 import type { Label } from "../../../backend/src/labels/labels.schema.ts";
-import { PendingConf } from "#/contants/config.ts";
+import { PaginationConf, PendingConf } from "#/contants/config.ts";
 import { Pagination } from "#/componets/Pagination.tsx";
 import { Table, type TableColumn } from "#/componets/Table.tsx";
 import { EntryItemColumn } from "#/componets/columnItems/EntryItemColumn.tsx";
@@ -17,6 +17,7 @@ import type { Project } from "../../../backend/src/projects/projects.schema.ts";
 import { EntryForm } from "#/componets/dialogForms/EntryForm.tsx";
 import { useState } from "react";
 import { NotFound } from "#/componets/placeholders/NotFound.tsx";
+import { type DayRange, toTimestampRange } from "#/shared/toTimestampRange.ts";
 
 type LoaderResponse = {
   data: (Entries & { project_name: string } & { labels: Label[] })[];
@@ -25,13 +26,17 @@ type LoaderResponse = {
   labels: Label[];
 };
 
-const loadData = async (deps: {
+const loadData = async ({
+  page,
+  sizePage,
+  ...days
+}: {
   page: number;
   sizePage: number;
-}): Promise<LoaderResponse> => {
+} & DayRange): Promise<LoaderResponse> => {
   const [projects, entries, labels] = await Promise.all([
     fetchProjects(),
-    fetchEntries(deps),
+    fetchEntries({ page, sizePage, ...toTimestampRange(days) }),
     fetchLabels(),
   ]);
 
@@ -65,7 +70,14 @@ const loadData = async (deps: {
 export const Route = createFileRoute("/entries")({
   component: RouteComponent,
   validateSearch: EntriesSearchSchema,
-  loaderDeps: ({ search: { page, sizePage } }) => ({ page, sizePage }),
+  loaderDeps: ({
+    search: {
+      page = PaginationConf.defalutPage,
+      sizePage = PaginationConf.defaultSizePage,
+      from,
+      to,
+    },
+  }) => ({ page, sizePage, from, to }),
   loader: async ({ deps }): Promise<LoaderResponse> => loadData(deps),
   pendingComponent: Pending,
   errorComponent: ErrorDisplay,

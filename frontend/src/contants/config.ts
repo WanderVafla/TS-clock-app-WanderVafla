@@ -4,7 +4,9 @@ export const PendingConf = {
 }
 
 export const PaginationConf = {
-  delataRange: 5
+  delataRange: 5,
+  defalutPage: 1,
+  defaultSizePage: 15,
 }
 
 export const LabelListConf = {

@@ -11,8 +11,11 @@ export type EntriesFetch = {
 }
 
 export const EntriesSearchSchema = v.object({
-  page: v.optional(v.unwrap(paginationParamsSchema.entries.page), 1),
-  sizePage: v.optional(v.unwrap(paginationParamsSchema.entries.sizePage), 15),
+  page: v.optional(paginationParamsSchema.entries.page),
+  sizePage: v.optional(paginationParamsSchema.entries.sizePage),
+  // Days as YYYY-MM-DD, both included; turned into timestamps by toTimestampRange
+  from: v.optional(v.pipe(v.string(), v.isoDate())),
+  to: v.optional(v.pipe(v.string(), v.isoDate())),
 });
 
 export type EntriesSearch = v.InferOutput<typeof EntriesSearchSchema>;
