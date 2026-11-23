@@ -41,7 +41,7 @@ export function Pagination({ metadata, search }: PaginationProp) {
         Math.min(totalPages, page + PaginationConf.delataRange),
       ).map((p) => {
         return (
-          <Link key={p} className={`pagination-button ${p === page ? 'bg-pagination-active' : 'bg-none'}`} to="/entries" search={(prev) => ({ ...prev, page: p })}>
+          <Link key={p} className={`pagination-button ${p === page ? 'bg-pagination-active border-clock-accent font-semibold text-table-head-text' : ''}`} to="/entries" search={(prev) => ({ ...prev, page: p })}>
             {p}
           </Link>
         );

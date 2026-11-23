@@ -5,7 +5,7 @@ type LabelItemType = {
 
 export function LabelItem({ name }: LabelItemType) {
   return (
-    <span className="p-1.5 bg-label truncate text-center rounded-2xl" title={name}>
+    <span className="truncate rounded-full border border-clock-border bg-label px-2.5 py-0.5 text-center text-xs text-clock-muted" title={name}>
       {name}
     </span>
   );

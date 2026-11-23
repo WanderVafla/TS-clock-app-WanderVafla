@@ -3,6 +3,7 @@ import { deleteProject } from "#/api/api.projects";
 import { useRouter } from "@tanstack/react-router";
 import type { Project } from "../../../../backend/src/projects/projects.schema";
 import { DeleteIcon, EditIcon } from "../icons/ActionIcons";
+import { ProjectsIcon } from "../icons/NavIcons";
 import type { ItemActionRow } from "#/shared/types";
 import { getMessageError } from "#/shared/getMessageError";
 
@@ -28,11 +29,20 @@ export function ProjectItemColumn({
   };
   return (
     <tr>
-      <td>{id}</td>
-      <td>{name}</td>
+      <td>
+        <div className="flex items-center gap-3">
+          <span
+            className="grid size-9 shrink-0 place-items-center rounded-[10px] bg-clock-selected text-lg text-table-head-text"
+            aria-hidden="true"
+          >
+            <ProjectsIcon />
+          </span>
+          <span className="truncate font-medium">{name}</span>
+        </div>
+      </td>
       <td>{dateFormat.format(new Date(created_at ?? ""))}</td>
       <td>
-        <div>
+        <div className="flex justify-end gap-3 text-2xl [&>*:hover]:text-hover">
           <button className="cursor-pointer" type="button" aria-label="Edit project" onClick={onEdit}>
             <EditIcon />
           </button>

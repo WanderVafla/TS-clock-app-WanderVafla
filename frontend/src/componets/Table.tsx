@@ -8,16 +8,18 @@ type TableProp = {
 
 export function Table({ columns, items, minWidth }: TableProp) {
   return (
-    <div>
+    // Scroll area: the table scrolls inside its card, so the rest of the page stays in place
+    <div className="min-h-0 flex-1 overflow-auto">
       <table
-        className="data-table h-full w-full text-base md:text-xl **:overflow-hidden [&_th]:overflow-visible"
+        className="data-table w-full text-sm md:text-[15px] **:overflow-hidden [&_th]:overflow-visible"
         style={
           minWidth
             ? ({ "--table-min-width": minWidth } as React.CSSProperties)
             : undefined
         }
       >
-        <thead>
+        {/* Stays visible while the rows scroll */}
+        <thead className="sticky top-0 z-1">
           <tr className="bg-table-head">
             {columns.map((c) => (
               <th
