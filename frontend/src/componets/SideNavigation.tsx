@@ -198,7 +198,7 @@ function ClockPopover({
         [position-try-fallbacks:flip-block,flip-inline]
         w-90 max-w-full p-4.5
         flex-col gap-3.5 [&:popover-open]:flex
-        rounded-[14px] border border-[#e1e4ea] bg-white text-[#15171c]
+        rounded-[14px] border border-clock-border bg-popover
         shadow-[0_12px_32px_rgba(21,23,28,0.14)]
         aria-busy:cursor-wait
         "
@@ -207,7 +207,7 @@ function ClockPopover({
 			{clockInAt && <ClockTimer clockInAt={clockInAt} />}
 			<fieldset disabled={isSubmitting} className="contents">
 				<fieldset className="flex flex-col gap-1">
-					<legend className="mb-1.5 text-[13px] font-medium text-[#3f4654]">
+					<legend className="mb-1.5 text-[13px] font-medium text-clock-muted">
 						Project
 					</legend>
 					{/* 4 rows max: 4 × h-10 (40px) + 3 × gap-1 (4px) = 172px, the rest scrolls */}
@@ -218,7 +218,7 @@ function ClockPopover({
 									key={p.id}
 									className="
                 flex h-10 shrink-0 items-center justify-between rounded-lg px-2.5 text-sm
-                has-checked:bg-[#e8edfb] has-checked:font-semibold has-checked:text-[#1a3596]
+                has-checked:bg-clock-selected has-checked:font-semibold has-checked:text-clock-accent
                 "
 								>
 									<span className="flex items-center gap-2.5">
@@ -228,7 +228,7 @@ function ClockPopover({
 											value={p.id}
 											checked={p.id === choisedProjectId}
 											onChange={() => setChoisedId(p.id)}
-											className="size-4.5 accent-[#2449c9]"
+											className="size-4.5 accent-clock-accent"
 										/>
 										{p.name}
 									</span>
@@ -241,7 +241,7 @@ function ClockPopover({
 				</fieldset>
 
 				<fieldset className="flex items-center gap-1.5">
-					<legend className="mb-1.5 text-[13px] font-medium text-[#3f4654]">
+					<legend className="mb-1.5 text-[13px] font-medium text-clock-muted">
 						Labels
 					</legend>
 					{/* One line only: chips that wrap are clipped by max-h-10 (one chip height).
@@ -253,9 +253,9 @@ function ClockPopover({
 									key={l.id}
 									className="
                 flex h-10 max-w-full grow cursor-pointer items-center justify-center
-                rounded-full border border-[#c9ced8] bg-white px-3.5 text-sm text-[#3f4654]
-                has-checked:border-[#2449c9] has-checked:bg-[#e8edfb]
-                has-checked:font-semibold has-checked:text-[#1a3596]
+                rounded-full border border-clock-border bg-popover px-3.5 text-sm text-clock-muted
+                has-checked:border-clock-accent has-checked:bg-clock-selected
+                has-checked:font-semibold has-checked:text-clock-accent
                 "
 								>
 									<input
@@ -277,7 +277,7 @@ function ClockPopover({
 						type="button"
 						popoverTarget="label-picker"
 						aria-label="Choose labels"
-						className="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[#c9ced8] bg-white text-lg text-[#3f4654] hover:border-[#2449c9]"
+						className="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-clock-border bg-popover text-lg text-clock-muted hover:border-clock-accent"
 					>
 						<NextPageIcon />
 					</button>
@@ -293,7 +293,7 @@ function ClockPopover({
 
 				<textarea
 					placeholder="Description"
-					className="m-0 rounded-lg bg-[#f7f8fa] px-3 py-2.5 text-[13px] text-[#3f4654] resize-none"
+					className="m-0 rounded-lg bg-gray-50 px-3 py-2.5 text-[13px] text-clock-muted resize-none"
 					value={description ?? ""}
 					onChange={(e) => setDescription(e.target.value)}
 				></textarea>
@@ -301,7 +301,7 @@ function ClockPopover({
 				<div className="flex gap-2">
 					<button
 						type="button"
-						className="h-11 flex-1 cursor-pointer rounded-[10px] bg-[#2449c9] text-sm font-semibold text-white"
+						className="h-11 flex-1 cursor-pointer rounded-[10px] bg-clock-accent text-sm font-semibold text-white"
 						onClick={handleClock}
 						disabled={choisedProjectId <= 0}
 					>
@@ -309,7 +309,7 @@ function ClockPopover({
 					</button>
 					<button
 						type="button"
-						className="h-11 flex-1 cursor-pointer rounded-[10px] border border-[#c9ced8] bg-white text-sm font-medium"
+						className="h-11 flex-1 cursor-pointer rounded-[10px] border border-clock-border bg-popover text-sm font-medium"
 						onClick={handleClockSwitch}
 						disabled={!clockStatus || choisedProjectId <= 0}
 					>
