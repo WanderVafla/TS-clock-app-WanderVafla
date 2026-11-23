@@ -33,7 +33,8 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <div className="flex flex-col w-full h-dvh md:flex-row">
+    // min-h, not h: the container grows with the page, so the sticky navigation stays on screen while scrolling
+    <div className="flex flex-col w-full min-h-dvh md:flex-row">
       <SideNavigation />
       <Outlet />
 

@@ -12,8 +12,6 @@
 
   --color-border: var(--color-primery);
   --color-button: var(--color-primery);
-  --color-hover-sidebar: var(--color-hover);
-  --color-side-navigation: var(--color-primery);
   --color-table-head: var(--color-primery);
   --color-table-border: var(--color-gray-300);
   --color-table-shadow: var(--color-gray-900);
@@ -28,6 +26,16 @@
   --color-clock-selected: #e8edfb;
   --color-clock-border: #c9ced8;
   --color-clock-muted: #3f4654;
+
+  /* Side navigation */
+  --color-side-navigation: var(--color-popover);
+  --color-side-navigation-border: #e1e4ea;
+  --color-side-navigation-text: var(--color-clock-muted);
+  --color-hover-sidebar: var(--color-clock-accent);
+  --color-side-navigation-active: var(--color-clock-selected);
+  --color-side-navigation-active-text: #1a3596;
+  /* Lifts the bottom bar on phones; none on the desktop column */
+  --shadow-side-navigation: 0 -4px 12px rgb(21 23 28 / 0.08);
 }
 
 * {
