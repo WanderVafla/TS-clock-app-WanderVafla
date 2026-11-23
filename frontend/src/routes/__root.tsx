@@ -12,42 +12,42 @@ import { Pending } from "#/componets/placeholders/Pending";
 import { SideNavigation } from "#/componets/SideNavigation";
 
 const loadRootData = async () => {
-	const [isClockRunning, projects, labels, lastEntries] = await Promise.all([
-		fetchClockStatus(),
-		fetchProjects(),
-		fetchLabels(),
-		fetchEntries({ order: "end_time", sizePage: 1 }),
-	]);
+  const [isClockRunning, projects, labels, lastEntries] = await Promise.all([
+    fetchClockStatus(),
+    fetchProjects(),
+    fetchLabels(),
+    fetchEntries({ order: "end_time", sizePage: 1 }),
+  ]);
 
-	const running = lastEntries.data[0];
-	const entriesLabels =
-		running && !running.end_time ? await fetchEntriesLabels([running.id]) : [];
-	return { isClockRunning, projects, labels, lastEntries, entriesLabels };
+  const running = lastEntries.data[0];
+  const entriesLabels =
+    running && !running.end_time ? await fetchEntriesLabels([running.id]) : [];
+  return { isClockRunning, projects, labels, lastEntries, entriesLabels };
 };
 
 export const Route = createRootRoute({
-	loader: loadRootData,
-	component: RootComponent,
-	pendingComponent: Pending,
+  loader: loadRootData,
+  component: RootComponent,
+  pendingComponent: Pending,
 });
 
 function RootComponent() {
-	return (
-		<div className="flex flex-col w-full h-dvh md:flex-row">
-			<SideNavigation />
-			<Outlet />
+  return (
+    <div className="flex flex-col w-full h-dvh md:flex-row">
+      <SideNavigation />
+      <Outlet />
 
-			<TanStackDevtools
-				config={{
-					position: "bottom-right",
-				}}
-				plugins={[
-					{
-						name: "TanStack Router",
-						render: <TanStackRouterDevtoolsPanel />,
-					},
-				]}
-			/>
-		</div>
-	);
+      <TanStackDevtools
+        config={{
+          position: "bottom-right",
+        }}
+        plugins={[
+          {
+            name: "TanStack Router",
+            render: <TanStackRouterDevtoolsPanel />,
+          },
+        ]}
+      />
+    </div>
+  );
 }
